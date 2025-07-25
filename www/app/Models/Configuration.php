@@ -29,26 +29,38 @@ class Configuration extends Model implements Auditable
     }
 
     const GROUP_GENERAL = 'general';
+
     const GROUP_BRANDING = 'branding';
+
     const GROUP_HOMEPAGE = 'homepage';
+
     const GROUP_CREDIT = 'credit';
+
     const GROUP_MAINTENANCE = 'maintenance';
+
     const GROUP_CONTACT = 'contact';
 
     const TYPE_STRING = 'string';
+
     const TYPE_TEXT = 'text';
+
     const TYPE_INTEGER = 'integer';
+
     const TYPE_BOOLEAN = 'boolean';
+
     const TYPE_JSON = 'json';
+
     const TYPE_FILE = 'file';
+
     const TYPE_EMAIL = 'email';
+
     const TYPE_URL = 'url';
 
     public static function get(string $key, $default = null)
     {
         $config = static::where('key', $key)->first();
-        
-        if (!$config) {
+
+        if (! $config) {
             return $default;
         }
 

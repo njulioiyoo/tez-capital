@@ -42,7 +42,7 @@ class ConfigurationController extends Controller
     public function store(ConfigurationStoreRequest $request): JsonResponse
     {
         $data = $request->validated();
-        
+
         if ($request->hasFile('file') && $data['type'] === 'file') {
             $file = $request->file('file');
             $path = $file->store('configurations', 'public');
@@ -85,12 +85,12 @@ class ConfigurationController extends Controller
     public function update(ConfigurationUpdateRequest $request, Configuration $configuration): JsonResponse
     {
         $data = $request->validated();
-        
+
         if ($request->hasFile('file') && $data['type'] === 'file') {
             if ($configuration->value && $configuration->type === 'file') {
                 Storage::disk('public')->delete($configuration->value);
             }
-            
+
             $file = $request->file('file');
             $path = $file->store('configurations', 'public');
             $data['value'] = $path;
@@ -141,10 +141,10 @@ class ConfigurationController extends Controller
 
         foreach ($configurations as $configData) {
             \Log::info('Processing config', ['configData' => $configData]);
-            
+
             // Handle value processing based on type
             $value = $configData['value'];
-            
+
             // For JSON type, ensure we store it properly
             if ($configData['type'] === 'json' && is_string($value)) {
                 // If it's already a JSON string, decode it first so Laravel can encode it again
@@ -153,17 +153,17 @@ class ConfigurationController extends Controller
                     $value = $decoded;
                 }
             }
-            
+
             // For boolean type, ensure proper boolean value
             if ($configData['type'] === 'boolean') {
                 $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
             }
-            
+
             // For integer type, ensure proper integer value
             if ($configData['type'] === 'integer') {
                 $value = (int) $value;
             }
-            
+
             $config = Configuration::updateOrCreate(
                 ['key' => $configData['key']],
                 [
@@ -180,7 +180,7 @@ class ConfigurationController extends Controller
                 'key' => $config->key,
                 'value' => $config->value,
                 'processed_value' => $value,
-                'fresh_value' => $config->fresh()->value
+                'fresh_value' => $config->fresh()->value,
             ]);
 
             $results[] = [
