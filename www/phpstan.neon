@@ -1,10 +1,10 @@
 includes:
     - ./vendor/larastan/larastan/extension.neon
-    # - ./vendor/tomasvotruba/unused-public/config/extension.neon
+    - ./vendor/tomasvotruba/unused-public/config/extension.neon
     # - ./vendor/phpstan/phpstan-strict-rules/rules.neon
 
 parameters:
-    level: 3
+    level: 4
     paths:
         - app
     checkUninitializedProperties: true
@@ -20,6 +20,14 @@ parameters:
         - '#Call to an undefined method.*::toMenuArray\(\)#'
         # All undefined property access (Laravel models with dynamic properties)
         - '#Access to an undefined property.*#'
+        # Ignore unused Controller methods (called by routes) - but KEEP unused variables
+        - '#Public method "App\\\\Http\\\\Controllers.*" is never used#'
+        # Ignore unused Model relationship methods  
+        - '#Public method "App\\\\Models.*::(parent|children|scopeActive|scopeRootItems|scopeOrdered)\(\)" is never used#'
+        # Ignore unused Model constants
+        - '#Public constant "App\\\\Models.*" is never used#'
+        # Ignore unused Middleware methods
+        - '#Public method "App\\\\Http\\\\Middleware.*" is never used#'
     tmpDir: bootstrap/cache
     checkOctaneCompatibility: true
     checkModelProperties: true
