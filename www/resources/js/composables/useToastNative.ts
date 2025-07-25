@@ -8,100 +8,228 @@ interface ToastOptions {
 let toastCounter = 0
 
 export const toast = (options: ToastOptions) => {
+  console.log('=== TOAST FUNCTION CALLED ===')
+  console.log('Options:', options)
+  console.log('Document ready state:', document.readyState)
+  console.log('Body exists:', !!document.body)
+  
   const {
     title,
-    description,
+    description = '',
     variant = 'success',
     duration = 5000
   } = options
   
-  console.log('Creating toast:', options)
+  console.log('Parsed options:', { title, description, variant, duration })
   
-  // Create toast container if it doesn't exist
-  let container = document.getElementById('toast-container')
-  if (!container) {
-    container = document.createElement('div')
-    container.id = 'toast-container'
-    container.className = 'fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none'
-    document.body.appendChild(container)
-  }
-  
-  // Create toast element
-  const toastId = `toast-${toastCounter++}`
-  const toastEl = document.createElement('div')
-  toastEl.id = toastId
-  toastEl.className = `
-    pointer-events-auto max-w-sm w-full bg-white shadow-lg rounded-lg border transform transition-all duration-300 ease-in-out
-    ${variant === 'error' ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'}
-    translate-x-full opacity-0
-  `.trim().replace(/\s+/g, ' ')
-  
-  // Create toast content
-  toastEl.innerHTML = `
-    <div class="flex items-start p-4">
-      <div class="flex-shrink-0">
-        ${variant === 'error' 
-          ? `<svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-             </svg>`
-          : `<svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-             </svg>`
-        }
-      </div>
-      <div class="ml-3 w-0 flex-1">
-        <p class="text-sm font-medium ${variant === 'error' ? 'text-red-800' : 'text-green-800'}">
-          ${title}
-        </p>
-        ${description ? `<p class="mt-1 text-sm ${variant === 'error' ? 'text-red-600' : 'text-green-600'}">${description}</p>` : ''}
-      </div>
-      <div class="ml-4 flex-shrink-0 flex">
-        <button 
-          class="inline-flex ${variant === 'error' ? 'text-red-400 hover:text-red-600' : 'text-green-400 hover:text-green-600'} focus:outline-none focus:ring-2 focus:ring-offset-2 ${variant === 'error' ? 'focus:ring-red-500' : 'focus:ring-green-500'} rounded-md p-1"
-          onclick="document.getElementById('${toastId}').remove()"
-        >
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  `
-  
-  // Add to container
-  container.appendChild(toastEl)
-  
-  // Trigger animation
-  setTimeout(() => {
-    toastEl.className = toastEl.className.replace('translate-x-full opacity-0', 'translate-x-0 opacity-100')
-  }, 10)
-  
-  // Auto remove
-  if (duration > 0) {
+  try {
+    // Create container if not exists
+    let container = document.getElementById('toast-container')
+    if (!container) {
+      console.log('Creating toast container')
+      container = document.createElement('div')
+      container.id = 'toast-container'
+      container.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1055;
+        pointer-events: none;
+        width: auto;
+        max-width: 350px;
+      `
+      document.body.appendChild(container)
+      console.log('Container created with styles:', container.style.cssText)
+      console.log('Container position in DOM:', container.getBoundingClientRect())
+    }
+    
+    // Create toast
+    const toastId = `toast-${toastCounter++}`
+    const toast = document.createElement('div')
+    toast.id = toastId
+    toast.className = 'toast'
+    toast.setAttribute('role', 'alert')
+    toast.setAttribute('aria-live', 'assertive')
+    toast.setAttribute('aria-atomic', 'true')
+    toast.style.cssText = `
+      pointer-events: auto;
+      max-width: 350px;
+      width: 350px;
+      margin-bottom: 12px;
+      background-color: rgba(255, 255, 255, 0.95);
+      background-clip: padding-box;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 0.375rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.15s linear;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      display: block;
+    `
+    console.log('Toast created with styles:', toast.style.cssText)
+    
+    // Create toast header
+    const toastHeader = document.createElement('div')
+    toastHeader.className = 'toast-header'
+    toastHeader.style.cssText = `
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      color: #6c757d;
+      background-color: rgba(255, 255, 255, 0.85);
+      background-clip: padding-box;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      border-top-left-radius: calc(0.375rem - 1px);
+      border-top-right-radius: calc(0.375rem - 1px);
+    `
+    
+    // Icon
+    const icon = document.createElement('div')
+    icon.style.cssText = `
+      width: 20px;
+      height: 20px;
+      margin-right: 0.5rem;
+      background-color: ${variant === 'error' ? '#dc3545' : '#198754'};
+      border-radius: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+    `
+    icon.innerHTML = variant === 'error' ? '×' : '✓'
+    
+    // Title
+    const titleEl = document.createElement('strong')
+    titleEl.className = 'me-auto'
+    titleEl.style.cssText = `
+      font-weight: 600;
+      color: #212529;
+      margin-right: auto;
+    `
+    titleEl.textContent = title
+    
+    // Time
+    const timeEl = document.createElement('small')
+    timeEl.style.cssText = 'color: #6c757d; margin-right: 0.5rem;'
+    timeEl.textContent = 'now'
+    
+    // Close button
+    const closeBtn = document.createElement('button')
+    closeBtn.type = 'button'
+    closeBtn.className = 'btn-close'
+    closeBtn.setAttribute('aria-label', 'Close')
+    closeBtn.style.cssText = `
+      box-sizing: content-box;
+      width: 1em;
+      height: 1em;
+      padding: 0.25em 0.25em;
+      color: #000;
+      background: transparent url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'><path d='m.235 1.027 1.027-.235 6.738 6.738 6.738-6.738 1.027.235-6.738 6.738 6.738 6.738-1.027.235-6.738-6.738-6.738 6.738-.235-1.027 6.738-6.738z'/></svg>") center/1em auto no-repeat;
+      border: 0;
+      border-radius: 0.375rem;
+      opacity: 0.5;
+      cursor: pointer;
+    `
+    closeBtn.onclick = () => removeToast(toastId)
+    
+    // Assemble header
+    toastHeader.appendChild(icon)
+    toastHeader.appendChild(titleEl)
+    toastHeader.appendChild(timeEl)
+    toastHeader.appendChild(closeBtn)
+    
+    // Create toast body if description exists
+    if (description) {
+      const toastBody = document.createElement('div')
+      toastBody.className = 'toast-body'
+      toastBody.style.cssText = `
+        padding: 0.75rem;
+        color: #212529;
+      `
+      toastBody.textContent = description
+      toast.appendChild(toastHeader)
+      toast.appendChild(toastBody)
+    } else {
+      toast.appendChild(toastHeader)
+    }
+    
+    // Add to container
+    container.appendChild(toast)
+    console.log('Toast element added to DOM:', toastId)
+    
+    // Animate in
     setTimeout(() => {
-      removeToast(toastId)
-    }, duration)
+      toast.style.opacity = '1'
+      toast.style.transform = 'translateX(0)'
+      console.log('Toast animated in - opacity:', toast.style.opacity, 'transform:', toast.style.transform)
+      console.log('Toast position in DOM:', toast.getBoundingClientRect())
+    }, 50)
+    
+    // Auto remove
+    if (duration > 0) {
+      setTimeout(() => {
+        console.log('Auto removing toast:', toastId)
+        removeToast(toastId)
+      }, duration)
+    }
+    
+    return toastId
+    
+  } catch (error) {
+    console.error('ERROR creating toast:', error)
+    console.error('Error stack:', error.stack)
+    console.error('Options passed:', options)
+    
+    // Create a simple fallback toast without complex styling
+    try {
+      const fallbackContainer = document.createElement('div')
+      fallbackContainer.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 999999;
+        background: ${variant === 'error' ? '#ff4444' : '#44ff44'};
+        color: white;
+        padding: 16px;
+        border-radius: 8px;
+        max-width: 300px;
+        font-family: system-ui;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      `
+      fallbackContainer.innerHTML = `<strong>${title}</strong>${description ? `<div style="margin-top:4px;">${description}</div>` : ''}`
+      document.body.appendChild(fallbackContainer)
+      
+      setTimeout(() => {
+        fallbackContainer.remove()
+      }, 5000)
+      
+      console.log('Fallback toast created')
+    } catch (fallbackError) {
+      console.error('Even fallback toast failed:', fallbackError)
+    }
   }
-  
-  console.log('Toast created with ID:', toastId)
-  return toastId
 }
 
 export const removeToast = (toastId: string) => {
-  const toastEl = document.getElementById(toastId)
-  if (toastEl) {
-    // Animate out
-    toastEl.className = toastEl.className.replace('translate-x-0 opacity-100', 'translate-x-full opacity-0')
+  console.log('Removing toast:', toastId)
+  const toast = document.getElementById(toastId)
+  if (toast) {
+    toast.style.opacity = '0'
+    toast.style.transform = 'translateX(100%)'
     
-    // Remove after animation
     setTimeout(() => {
-      toastEl.remove()
+      toast.remove()
+      console.log('Toast removed from DOM')
       
-      // Clean up container if empty
+      // Clean up container
       const container = document.getElementById('toast-container')
       if (container && container.children.length === 0) {
         container.remove()
+        console.log('Container cleaned up')
       }
-    }, 300)
+    }, 150)
   }
 }
