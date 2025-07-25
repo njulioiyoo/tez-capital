@@ -125,24 +125,49 @@ const saveBulkConfigurations = async (group: string, changes: Array<{key: string
             );
             
             if (nonFileChanges.length > 0) {
-                await saveBulkNonFileConfigurations(group, nonFileChanges);
+                const result = await saveBulkNonFileConfigurations(group, nonFileChanges);
+                
+                // Update local state with server response for non-file changes
+                if (result && result.data) {
+                    for (const config of result.data) {
+                        if (!configurations.value[config.group]) {
+                            configurations.value[config.group] = {};
+                        }
+                        configurations.value[config.group][config.key] = {
+                            value: config.value,
+                            type: config.type,
+                            description: config.description,
+                            is_public: config.is_public
+                        };
+                    }
+                }
+            }
+            
+            // For file uploads, we need to reload configurations since file handling is different
+            if (changes.some(change => change.type === 'file' && change.value instanceof File)) {
+                await loadConfigurations();
             }
         } else {
             // All non-file data, use bulk update
-            await saveBulkNonFileConfigurations(group, changes);
-        }
-
-        // Update local state instead of full reload for better performance
-        for (const change of changes) {
-            if (!configurations.value[group]) {
-                configurations.value[group] = {};
+            const result = await saveBulkNonFileConfigurations(group, changes);
+            
+            // Update local state with server response data for accuracy
+            if (result && result.data) {
+                for (const config of result.data) {
+                    if (!configurations.value[config.group]) {
+                        configurations.value[config.group] = {};
+                    }
+                    configurations.value[config.group][config.key] = {
+                        value: config.value,
+                        type: config.type,
+                        description: config.description,
+                        is_public: config.is_public
+                    };
+                }
+            } else {
+                // Fallback: reload all configurations if no response data
+                await loadConfigurations();
             }
-            configurations.value[group][change.key] = {
-                value: change.value,
-                type: change.type,
-                description: '',
-                is_public: true
-            };
         }
         
         toast({
@@ -195,6 +220,7 @@ const saveBulkNonFileConfigurations = async (group: string, changes: Array<{key:
 
     const result = await response.json();
     console.log('Save result:', result); // Debug log
+    return result;
 };
 
 // Alias for backward compatibility

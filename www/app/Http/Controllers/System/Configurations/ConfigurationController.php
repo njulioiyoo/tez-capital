@@ -188,6 +188,8 @@ class ConfigurationController extends Controller
                 'value' => $config->getValue(),
                 'type' => $config->type,
                 'group' => $config->group,
+                'description' => $config->description,
+                'is_public' => $config->is_public,
             ];
         }
 
