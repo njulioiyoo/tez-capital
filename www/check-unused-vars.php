@@ -11,7 +11,12 @@ function checkUnusedVariables($file)
     $errors = [];
 
     foreach ($lines as $lineNum => $line) {
-        // Look for variable assignments like $var = 'value';
+        // Skip comments
+        if (trim($line) === '' || strpos(trim($line), '//') === 0 || strpos(trim($line), '#') === 0) {
+            continue;
+        }
+
+        // Look for variable assignments like $someVar = 'value';
         if (preg_match('/\$(\w+)\s*=/', $line, $matches)) {
             $varName = $matches[1];
             $varPattern = '/\$'.preg_quote($varName, '/').'\b/';
@@ -37,11 +42,11 @@ function checkUnusedVariables($file)
 exec('cd .. && git diff --cached --name-only --diff-filter=ACM | grep "\.php$" | grep "^www/"', $files);
 
 // Remove 'www/' prefix from paths since we're working from www directory
-$files = array_map(function($file) {
+$files = array_map(function ($file) {
     return str_replace('www/', '', $file);
 }, $files);
 
-echo "Checking files: " . implode(', ', $files) . "\n";
+// echo "Checking files: " . implode(', ', $files) . "\n"; // Debug disabled
 
 $hasErrors = false;
 
