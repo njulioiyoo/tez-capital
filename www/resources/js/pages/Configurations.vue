@@ -377,6 +377,25 @@ const saveBulkNonFileConfigurations = async (group: string, changes: Array<{key:
     }
 };
 
+// Test function for debugging toast
+const testToast = () => {
+    console.log('Test toast clicked'); // Debug log
+    toast({
+        title: 'Test Toast',
+        description: 'This is a test toast notification',
+        variant: 'default'
+    });
+    
+    // Test error toast after 2 seconds
+    setTimeout(() => {
+        toast({
+            title: 'Error Test',
+            description: 'This is a test error notification',
+            variant: 'destructive'
+        });
+    }, 2000);
+};
+
 // Alias for backward compatibility
 const saveConfiguration = saveOrUpdateConfiguration;
 const updateConfiguration = (configId: number, group: string, key: string, value: any, type: string = 'string') => {
@@ -397,15 +416,24 @@ onMounted(() => {
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     Website Configurations
                 </h2>
-                <Button 
-                    @click="loadConfigurations" 
-                    variant="outline" 
-                    size="sm"
-                    :disabled="isLoading"
-                >
-                    <RefreshCw :class="{ 'animate-spin': isLoading }" class="w-4 h-4 mr-2" />
-                    Refresh
-                </Button>
+                <div class="flex gap-2">
+                    <Button 
+                        @click="loadConfigurations" 
+                        variant="outline" 
+                        size="sm"
+                        :disabled="isLoading"
+                    >
+                        <RefreshCw :class="{ 'animate-spin': isLoading }" class="w-4 h-4 mr-2" />
+                        Refresh
+                    </Button>
+                    <Button 
+                        @click="testToast" 
+                        variant="outline" 
+                        size="sm"
+                    >
+                        Test Toast
+                    </Button>
+                </div>
             </div>
         </template>
 
