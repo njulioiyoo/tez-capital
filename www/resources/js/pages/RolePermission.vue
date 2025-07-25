@@ -179,7 +179,8 @@ const confirmDelete = async () => {
         if (response.ok) {
             toast({
                 title: 'Success',
-                description: `${confirmDialog.value.type === 'role' ? 'Role' : 'Permission'} deleted successfully`
+                description: `${confirmDialog.value.type === 'role' ? 'Role' : 'Permission'} deleted successfully`,
+                variant: 'success'
             });
             setTimeout(() => {
                 window.location.reload();
@@ -188,7 +189,7 @@ const confirmDelete = async () => {
             toast({
                 title: 'Error',
                 description: `Failed to delete ${confirmDialog.value.type}`,
-                variant: 'destructive'
+                variant: 'error'
             });
         }
     } catch (error) {

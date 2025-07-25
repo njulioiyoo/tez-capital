@@ -241,7 +241,8 @@ const saveUser = async () => {
             
             toast({
                 title: 'Success',
-                description: editingUser.value ? 'User updated successfully' : 'User created successfully'
+                description: editingUser.value ? 'User updated successfully' : 'User created successfully',
+                variant: 'success'
             });
             
             // Reload page to refresh data
@@ -253,7 +254,7 @@ const saveUser = async () => {
                 toast({
                     title: 'Session Expired',
                     description: 'Your session has expired. The page will reload automatically.',
-                    variant: 'destructive'
+                    variant: 'error'
                 });
                 setTimeout(() => {
                     window.location.reload();
@@ -290,7 +291,8 @@ const deleteUser = async (user: User) => {
         if (response.ok) {
             toast({
                 title: 'Success',
-                description: 'User deleted successfully'
+                description: 'User deleted successfully',
+                variant: 'success'
             });
             setTimeout(() => {
                 window.location.reload();
@@ -300,7 +302,7 @@ const deleteUser = async (user: User) => {
             toast({
                 title: 'Error',
                 description: data.message || 'Error deleting user',
-                variant: 'destructive'
+                variant: 'error'
             });
         }
     } catch (error) {
@@ -323,7 +325,8 @@ const toggleUserStatus = async (user: User) => {
         if (response.ok) {
             toast({
                 title: 'Success',
-                description: `User status updated successfully`
+                description: `User status updated successfully`,
+                variant: 'success'
             });
             setTimeout(() => {
                 window.location.reload();
@@ -333,7 +336,7 @@ const toggleUserStatus = async (user: User) => {
             toast({
                 title: 'Error',
                 description: data.message || 'Error updating user status',
-                variant: 'destructive'
+                variant: 'error'
             });
         }
     } catch (error) {
@@ -396,7 +399,8 @@ const performBulkAction = async () => {
             
             toast({
                 title: 'Success',
-                description: 'Bulk action completed successfully'
+                description: 'Bulk action completed successfully',
+                variant: 'success'
             });
             
             setTimeout(() => {
@@ -414,7 +418,7 @@ const performBulkAction = async () => {
                 toast({
                     title: 'Session Expired',
                     description: 'Your session has expired. The page will reload automatically.',
-                    variant: 'destructive'
+                    variant: 'error'
                 });
                 setTimeout(() => {
                     window.location.reload();
@@ -423,7 +427,7 @@ const performBulkAction = async () => {
                 toast({
                     title: 'Error',
                     description: data.message || 'Error performing bulk action',
-                    variant: 'destructive'
+                    variant: 'error'
                 });
             }
         }

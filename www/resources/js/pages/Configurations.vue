@@ -102,7 +102,7 @@ const loadConfigurations = async () => {
         toast({
             title: 'Error',
             description: 'Failed to load configurations',
-            variant: 'destructive',
+            variant: 'error',
         });
     } finally {
         isLoading.value = false;
@@ -250,6 +250,7 @@ const saveBulkConfigurations = async (group: string, changes: Array<{key: string
         toast({
             title: 'Success',
             description: `${changes.length} configuration${changes.length > 1 ? 's' : ''} saved successfully`,
+            variant: 'success',
         });
     } catch (error) {
         console.error('Error saving configurations:', error);
@@ -258,7 +259,7 @@ const saveBulkConfigurations = async (group: string, changes: Array<{key: string
             toast({
                 title: 'Session Expired',
                 description: 'Your session has expired. The page will reload automatically.',
-                variant: 'destructive',
+                variant: 'error',
             });
             
             // Reload page after short delay to show toast
@@ -269,7 +270,7 @@ const saveBulkConfigurations = async (group: string, changes: Array<{key: string
             toast({
                 title: 'Error',
                 description: error.message || 'Failed to save configurations',
-                variant: 'destructive',
+                variant: 'error',
             });
         }
     } finally {
@@ -383,7 +384,7 @@ const testToast = () => {
     toast({
         title: 'Test Toast',
         description: 'This is a test toast notification',
-        variant: 'default'
+        variant: 'success'
     });
     
     // Test error toast after 2 seconds
@@ -391,7 +392,7 @@ const testToast = () => {
         toast({
             title: 'Error Test',
             description: 'This is a test error notification',
-            variant: 'destructive'
+            variant: 'error'
         });
     }, 2000);
 };

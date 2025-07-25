@@ -163,7 +163,8 @@ const saveMenuItem = async () => {
             if (success) {
                 toast({
                     title: 'Success',
-                    description: 'Menu item updated successfully'
+                    description: 'Menu item updated successfully',
+                    variant: 'success'
                 });
             }
         } else {
@@ -171,7 +172,8 @@ const saveMenuItem = async () => {
             if (success) {
                 toast({
                     title: 'Success',
-                    description: 'Menu item created successfully'
+                    description: 'Menu item created successfully',
+                    variant: 'success'
                 });
             }
         }
@@ -183,7 +185,7 @@ const saveMenuItem = async () => {
             toast({
                 title: 'Error',
                 description: 'Failed to save menu item',
-                variant: 'destructive'
+                variant: 'error'
             });
         }
     } catch (error) {
@@ -206,13 +208,14 @@ const confirmDelete = async () => {
         await removeMenuItem(confirmDialog.value.itemId);
         toast({
             title: 'Success',
-            description: 'Menu item deleted successfully'
+            description: 'Menu item deleted successfully',
+            variant: 'success'
         });
     } catch (error) {
         toast({
             title: 'Error',
             description: 'Failed to delete menu item',
-            variant: 'destructive'
+            variant: 'error'
         });
     } finally {
         confirmDialog.value.loading = false;

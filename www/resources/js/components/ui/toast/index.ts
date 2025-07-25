@@ -1,1 +1,1 @@
-export { toast, removeToast } from '@/composables/useToastSimple'
+export { toast, removeToast } from '@/composables/useToastNative'
