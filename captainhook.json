@@ -17,6 +17,11 @@
         "enabled": true,
         "actions": [
             {
+                "action": "cd www && php check-unused-vars.php",
+                "options": [],
+                "conditions": []
+            },
+            {
                 "action": "cd www && vendor/bin/pint --test",
                 "options": [],
                 "conditions": []

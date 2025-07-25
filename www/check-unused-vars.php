@@ -33,8 +33,15 @@ function checkUnusedVariables($file)
     return $errors;
 }
 
-// Get files to check from git staged files
-exec('git diff --cached --name-only --diff-filter=ACM | grep "\.php$"', $files);
+// Get files to check from git staged files (run from root dir)
+exec('cd .. && git diff --cached --name-only --diff-filter=ACM | grep "\.php$" | grep "^www/"', $files);
+
+// Remove 'www/' prefix from paths since we're working from www directory
+$files = array_map(function($file) {
+    return str_replace('www/', '', $file);
+}, $files);
+
+echo "Checking files: " . implode(', ', $files) . "\n";
 
 $hasErrors = false;
 
