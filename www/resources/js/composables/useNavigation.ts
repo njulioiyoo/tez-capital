@@ -123,7 +123,7 @@ export function useNavigation() {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    'X-CSRF-TOKEN': getCsrfToken(),
                 },
                 body: JSON.stringify(payload),
                 credentials: 'same-origin',
@@ -164,7 +164,7 @@ export function useNavigation() {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    'X-CSRF-TOKEN': getCsrfToken(),
                 },
                 body: JSON.stringify(payload),
                 credentials: 'same-origin',
@@ -182,6 +182,26 @@ export function useNavigation() {
         }
     };
 
+    // Helper function to get CSRF token
+    const getCsrfToken = () => {
+        const tokenFromMeta = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (tokenFromMeta) return tokenFromMeta;
+        
+        const tokenFromCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('XSRF-TOKEN='))
+            ?.split('=')[1];
+        
+        if (tokenFromCookie) {
+            try {
+                return decodeURIComponent(tokenFromCookie);
+            } catch (e) {
+                console.warn('Failed to decode CSRF token from cookie:', e);
+            }
+        }
+        return '';
+    };
+
     // Remove menu item
     const removeMenuItem = async (id: string) => {
         try {
@@ -190,7 +210,7 @@ export function useNavigation() {
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    'X-CSRF-TOKEN': getCsrfToken(),
                 },
                 credentials: 'same-origin',
             });
@@ -216,7 +236,7 @@ export function useNavigation() {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    'X-CSRF-TOKEN': getCsrfToken(),
                 },
                 body: JSON.stringify({ items }),
                 credentials: 'same-origin',

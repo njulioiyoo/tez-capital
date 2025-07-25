@@ -146,11 +146,34 @@ const confirmDelete = async () => {
             ? `/api/system/roles-permissions/roles/${confirmDialog.value.itemId}`
             : `/api/system/roles-permissions/permissions/${confirmDialog.value.itemId}`;
             
+        // Helper function to get CSRF token (same as other modules)
+        const getCsrfToken = () => {
+            const tokenFromMeta = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (tokenFromMeta) return tokenFromMeta;
+            
+            const tokenFromCookie = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('XSRF-TOKEN='))
+                ?.split('=')[1];
+            
+            if (tokenFromCookie) {
+                try {
+                    return decodeURIComponent(tokenFromCookie);
+                } catch (e) {
+                    console.warn('Failed to decode CSRF token from cookie:', e);
+                }
+            }
+            return '';
+        };
+
         const response = await fetch(endpoint, {
             method: 'DELETE',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': getCsrfToken(),
             },
+            credentials: 'same-origin',
         });
         
         if (response.ok) {
