@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue';
+import { toast } from '@/components/ui/toast';
 import { Plus, Edit, Trash2, Shield, Key } from 'lucide-vue-next';
 
 interface Permission {
@@ -38,6 +40,12 @@ const roleDialogOpen = ref(false);
 const permissionDialogOpen = ref(false);
 const editingRole = ref<Role | null>(null);
 const editingPermission = ref<Permission | null>(null);
+const confirmDialog = ref({
+    open: false,
+    type: '' as 'role' | 'permission',
+    itemId: 0,
+    loading: false
+});
 
 const roleForm = reactive({
     name: '',
@@ -118,41 +126,59 @@ const savePermission = async () => {
     }
 };
 
-const deleteRole = async (role: Role) => {
-    if (confirm('Are you sure you want to delete this role?')) {
-        try {
-            const response = await fetch(`/api/system/roles-permissions/roles/${role.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-            });
-            
-            if (response.ok) {
-                window.location.reload();
-            }
-        } catch (error) {
-            console.error('Error deleting role:', error);
-        }
-    }
+const deleteRole = (role: Role) => {
+    confirmDialog.value.type = 'role';
+    confirmDialog.value.itemId = role.id;
+    confirmDialog.value.open = true;
 };
 
-const deletePermission = async (permission: Permission) => {
-    if (confirm('Are you sure you want to delete this permission?')) {
-        try {
-            const response = await fetch(`/api/system/roles-permissions/permissions/${permission.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-            });
+const deletePermission = (permission: Permission) => {
+    confirmDialog.value.type = 'permission';
+    confirmDialog.value.itemId = permission.id;
+    confirmDialog.value.open = true;
+};
+
+const confirmDelete = async () => {
+    confirmDialog.value.loading = true;
+    
+    try {
+        const endpoint = confirmDialog.value.type === 'role' 
+            ? `/api/system/roles-permissions/roles/${confirmDialog.value.itemId}`
+            : `/api/system/roles-permissions/permissions/${confirmDialog.value.itemId}`;
             
-            if (response.ok) {
+        const response = await fetch(endpoint, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            },
+        });
+        
+        if (response.ok) {
+            toast({
+                title: 'Success',
+                description: `${confirmDialog.value.type === 'role' ? 'Role' : 'Permission'} deleted successfully`
+            });
+            setTimeout(() => {
                 window.location.reload();
-            }
-        } catch (error) {
-            console.error('Error deleting permission:', error);
+            }, 1000);
+        } else {
+            toast({
+                title: 'Error',
+                description: `Failed to delete ${confirmDialog.value.type}`,
+                variant: 'destructive'
+            });
         }
+    } catch (error) {
+        toast({
+            title: 'Error',
+            description: `Failed to delete ${confirmDialog.value.type}`,
+            variant: 'destructive'
+        });
+    } finally {
+        confirmDialog.value.loading = false;
+        confirmDialog.value.open = false;
+        confirmDialog.value.itemId = 0;
+        confirmDialog.value.type = '' as any;
     }
 };
 </script>
@@ -308,4 +334,14 @@ const deletePermission = async (permission: Permission) => {
             </div>
         </div>
     </AppLayout>
+    
+    <!-- Confirm Delete Dialog -->
+    <ConfirmDialog
+        v-model:open="confirmDialog.open"
+        :title="`Delete ${confirmDialog.type === 'role' ? 'Role' : 'Permission'}`"
+        :description="`Are you sure you want to delete this ${confirmDialog.type}? This action cannot be undone.`"
+        confirm-text="Delete"
+        :loading="confirmDialog.loading"
+        @confirm="confirmDelete"
+    />
 </template>

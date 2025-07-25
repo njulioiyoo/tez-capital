@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue';
+import { toast } from '@/components/ui/toast';
 import { 
     LayoutGrid, 
     Users, 
@@ -55,6 +57,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const isDialogOpen = ref(false);
 const editingItem = ref<NavItem | null>(null);
+const confirmDialog = ref({
+    open: false,
+    itemId: '',
+    loading: false
+});
 // Expand all items by default so we can see child items for drag and drop
 const expandedItems = ref<Set<string>>(new Set(['2', '8'])); // System Management & Reports
 
@@ -150,21 +157,67 @@ const saveMenuItem = async () => {
     };
 
     let success = false;
-    if (editingItem.value) {
-        success = await updateMenuItem(editingItem.value.id, menuItem);
-    } else {
-        success = await addMenuItem(menuItem);
-    }
+    try {
+        if (editingItem.value) {
+            success = await updateMenuItem(editingItem.value.id, menuItem);
+            if (success) {
+                toast({
+                    title: 'Success',
+                    description: 'Menu item updated successfully'
+                });
+            }
+        } else {
+            success = await addMenuItem(menuItem);
+            if (success) {
+                toast({
+                    title: 'Success',
+                    description: 'Menu item created successfully'
+                });
+            }
+        }
 
-    if (success) {
-        isDialogOpen.value = false;
-        resetForm();
+        if (success) {
+            isDialogOpen.value = false;
+            resetForm();
+        } else {
+            toast({
+                title: 'Error',
+                description: 'Failed to save menu item',
+                variant: 'destructive'
+            });
+        }
+    } catch (error) {
+        toast({
+            title: 'Error',
+            description: 'Failed to save menu item',
+            variant: 'destructive'
+        });
     }
 };
 
-const deleteMenuItem = async (id: string) => {
-    if (confirm('Are you sure you want to delete this menu item?')) {
-        await removeMenuItem(id);
+const deleteMenuItem = (id: string) => {
+    confirmDialog.value.itemId = id;
+    confirmDialog.value.open = true;
+};
+
+const confirmDelete = async () => {
+    confirmDialog.value.loading = true;
+    try {
+        await removeMenuItem(confirmDialog.value.itemId);
+        toast({
+            title: 'Success',
+            description: 'Menu item deleted successfully'
+        });
+    } catch (error) {
+        toast({
+            title: 'Error',
+            description: 'Failed to delete menu item',
+            variant: 'destructive'
+        });
+    } finally {
+        confirmDialog.value.loading = false;
+        confirmDialog.value.open = false;
+        confirmDialog.value.itemId = '';
     }
 };
 
@@ -548,4 +601,14 @@ const handleDragEnd = () => {
             </div>
         </div>
     </AppLayout>
+    
+    <!-- Confirm Delete Dialog -->
+    <ConfirmDialog
+        v-model:open="confirmDialog.open"
+        title="Delete Menu Item"
+        description="Are you sure you want to delete this menu item? This action cannot be undone."
+        confirm-text="Delete"
+        :loading="confirmDialog.loading"
+        @confirm="confirmDelete"
+    />
 </template>
