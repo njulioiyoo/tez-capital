@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, nextTick } from 'vue';
 import { type BreadcrumbItem } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -129,18 +129,32 @@ const saveBulkConfigurations = async (group: string, changes: Array<{key: string
                 
                 // Update local state with server response for non-file changes
                 if (result && result.data) {
+                    console.log('Updating non-file changes with server response:', result.data);
                     for (const config of result.data) {
                         if (!configurations.value[config.group]) {
                             configurations.value[config.group] = {};
                         }
-                        configurations.value[config.group][config.key] = {
-                            value: config.value,
-                            type: config.type,
-                            description: config.description,
-                            is_public: config.is_public
+                        
+                        console.log(`Updating non-file ${config.group}.${config.key}:`, {
+                            old: configurations.value[config.group][config.key]?.value,
+                            new: config.value
+                        });
+                        
+                        // Force Vue reactivity by creating new object reference
+                        configurations.value[config.group] = {
+                            ...configurations.value[config.group],
+                            [config.key]: {
+                                value: config.value,
+                                type: config.type,
+                                description: config.description,
+                                is_public: config.is_public
+                            }
                         };
                     }
                 }
+                
+                // Force Vue to update DOM  
+                await nextTick();
             }
             
             // For file uploads, we need to reload configurations since file handling is different
@@ -153,19 +167,36 @@ const saveBulkConfigurations = async (group: string, changes: Array<{key: string
             
             // Update local state with server response data for accuracy
             if (result && result.data) {
+                console.log('Updating local state with server response:', result.data);
                 for (const config of result.data) {
                     if (!configurations.value[config.group]) {
                         configurations.value[config.group] = {};
                     }
-                    configurations.value[config.group][config.key] = {
-                        value: config.value,
-                        type: config.type,
-                        description: config.description,
-                        is_public: config.is_public
+                    
+                    console.log(`Updating ${config.group}.${config.key}:`, {
+                        old: configurations.value[config.group][config.key]?.value,
+                        new: config.value
+                    });
+                    
+                    // Force Vue reactivity by creating new object reference
+                    configurations.value[config.group] = {
+                        ...configurations.value[config.group],
+                        [config.key]: {
+                            value: config.value,
+                            type: config.type,
+                            description: config.description,
+                            is_public: config.is_public
+                        }
                     };
                 }
+                
+                console.log('Local state after update:', configurations.value[group]);
+                
+                // Force Vue to update DOM
+                await nextTick();
             } else {
                 // Fallback: reload all configurations if no response data
+                console.log('No response data, reloading configurations');
                 await loadConfigurations();
             }
         }
