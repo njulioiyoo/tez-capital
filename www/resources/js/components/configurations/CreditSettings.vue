@@ -46,16 +46,28 @@ watch(() => props.configurations, (newConfigs) => {
         form.max_amount = newConfigs.credit_max_amount?.value || 500000000;
         form.admin_fee = parseFloat(newConfigs.credit_admin_fee?.value || '2.5');
 
-        try {
-            form.tenors = JSON.parse(newConfigs.credit_tenors?.value || '[6,12,18,24,36,48]');
-        } catch {
-            form.tenors = [6, 12, 18, 24, 36, 48];
+        // Handle tenors - could be array or JSON string
+        const tenorsValue = newConfigs.credit_tenors?.value;
+        if (Array.isArray(tenorsValue)) {
+            form.tenors = [...tenorsValue]; // Create new array to avoid proxy issues
+        } else {
+            try {
+                form.tenors = JSON.parse(tenorsValue || '[6,12,18,24,36,48]');
+            } catch {
+                form.tenors = [6, 12, 18, 24, 36, 48];
+            }
         }
 
-        try {
-            form.interest_rates = JSON.parse(newConfigs.credit_interest_rates?.value || '{"6":12,"12":13,"18":14,"24":15,"36":16,"48":17}');
-        } catch {
-            form.interest_rates = { 6: 12, 12: 13, 18: 14, 24: 15, 36: 16, 48: 17 };
+        // Handle interest rates - could be object or JSON string
+        const ratesValue = newConfigs.credit_interest_rates?.value;
+        if (typeof ratesValue === 'object' && ratesValue !== null && !Array.isArray(ratesValue)) {
+            form.interest_rates = { ...ratesValue }; // Create new object to avoid proxy issues
+        } else {
+            try {
+                form.interest_rates = JSON.parse(ratesValue || '{"6":12,"12":13,"18":14,"24":15,"36":16,"48":17}');
+            } catch {
+                form.interest_rates = { 6: 12, 12: 13, 18: 14, 24: 15, 36: 16, 48: 17 };
+            }
         }
     }
 }, { immediate: true, deep: true });
@@ -104,13 +116,17 @@ const saveSettings = () => {
         changes.push({ key: 'credit_max_amount', value: form.max_amount, type: 'integer' });
     }
 
-    const currentTenorsStr = props.configurations.credit_tenors?.value || '[6,12,18,24,36,48]';
+    // Compare tenors properly - convert both to JSON strings for comparison
+    const currentTenors = props.configurations.credit_tenors?.value || [6,12,18,24,36,48];
+    const currentTenorsStr = JSON.stringify(Array.isArray(currentTenors) ? currentTenors : JSON.parse(currentTenors));
     const formTenorsStr = JSON.stringify(form.tenors);
     if (currentTenorsStr !== formTenorsStr) {
         changes.push({ key: 'credit_tenors', value: form.tenors, type: 'json' });
     }
 
-    const currentRatesStr = props.configurations.credit_interest_rates?.value || '{"6":12,"12":13,"18":14,"24":15,"36":16,"48":17}';
+    // Compare interest rates properly - convert both to JSON strings for comparison
+    const currentRates = props.configurations.credit_interest_rates?.value || {"6":12,"12":13,"18":14,"24":15,"36":16,"48":17};
+    const currentRatesStr = JSON.stringify(typeof currentRates === 'object' ? currentRates : JSON.parse(currentRates));
     const formRatesStr = JSON.stringify(form.interest_rates);
     if (currentRatesStr !== formRatesStr) {
         changes.push({ key: 'credit_interest_rates', value: form.interest_rates, type: 'json' });

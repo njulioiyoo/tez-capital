@@ -42,6 +42,9 @@ Route::prefix('api')->group(function () {
     // Public endpoints
     Route::get('menu-items', [MenuController::class, 'index'])->name('api.menu-items.index');
     Route::get('configurations/public', [ConfigurationController::class, 'getPublic'])->name('api.configurations.public');
+    Route::get('csrf-token', function () {
+        return response()->json(['csrf_token' => csrf_token()]);
+    })->name('api.csrf-token');
 
     // Protected endpoints
     Route::middleware(['auth', 'verified'])->group(function () {

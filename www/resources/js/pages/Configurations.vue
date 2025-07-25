@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { ref, reactive, onMounted, nextTick } from 'vue';
 import { type BreadcrumbItem } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,16 +47,47 @@ const configurations = ref<ConfigurationData>({});
 const isLoading = ref(false);
 const isSaving = ref(false);
 
+// Helper function to get CSRF token
+const getCsrfToken = () => {
+    // Try meta tag first (most reliable for Laravel)
+    const tokenFromMeta = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (tokenFromMeta) {
+        return tokenFromMeta;
+    }
+    
+    // Fallback to cookie (decode properly)
+    const tokenFromCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1];
+    
+    if (tokenFromCookie) {
+        try {
+            return decodeURIComponent(tokenFromCookie);
+        } catch (e) {
+            console.warn('Failed to decode CSRF token from cookie:', e);
+        }
+    }
+    
+    console.warn('No CSRF token found in meta tag or cookie');
+    return '';
+};
+
 const loadConfigurations = async () => {
     isLoading.value = true;
     try {
+        const csrfToken = getCsrfToken();
+        if (!csrfToken) {
+            console.warn('CSRF token not found for loading configurations');
+        }
+
         const response = await fetch('/api/system/configurations', {
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-CSRF-TOKEN': csrfToken,
             }
         });
         
@@ -102,18 +133,33 @@ const saveBulkConfigurations = async (group: string, changes: Array<{key: string
                     formData.append('description', '');
                     formData.append('is_public', '1');
                     
+                    const csrfToken = getCsrfToken();
+                    if (!csrfToken) {
+                        throw new Error('CSRF token not found. Please refresh the page and try again.');
+                    }
+
                     const response = await fetch(`/api/system/configurations`, {
                         method: 'POST',
                         body: formData,
                         credentials: 'same-origin',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                            'X-CSRF-TOKEN': csrfToken,
                         },
                     });
 
                     if (!response.ok) {
                         const errorData = await response.json();
+                        console.error('File upload error:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            data: errorData
+                        });
+                        
+                        if (response.status === 419 || (errorData.message && errorData.message.includes('CSRF'))) {
+                            throw new Error('Session expired or CSRF token mismatch. Please refresh the page and try again.');
+                        }
+                        
                         throw new Error(errorData.message || `Failed to save ${change.key}`);
                     }
                 }
@@ -207,14 +253,57 @@ const saveBulkConfigurations = async (group: string, changes: Array<{key: string
         });
     } catch (error) {
         console.error('Error saving configurations:', error);
-        toast({
-            title: 'Error',
-            description: error.message || 'Failed to save configurations',
-            variant: 'destructive',
-        });
+        
+        if (error.message && error.message.includes('CSRF token mismatch')) {
+            toast({
+                title: 'Session Expired',
+                description: 'Your session has expired. The page will reload automatically.',
+                variant: 'destructive',
+            });
+            
+            // Reload page after short delay to show toast
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            toast({
+                title: 'Error',
+                description: error.message || 'Failed to save configurations',
+                variant: 'destructive',
+            });
+        }
     } finally {
         isSaving.value = false;
     }
+};
+
+// Helper function to refresh CSRF token from server
+const refreshCsrfToken = async () => {
+    try {
+        const response = await fetch('/api/csrf-token', {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.csrf_token) {
+                // Update meta tag
+                const metaTag = document.querySelector('meta[name="csrf-token"]');
+                if (metaTag) {
+                    metaTag.setAttribute('content', data.csrf_token);
+                }
+                return data.csrf_token;
+            }
+        }
+    } catch (e) {
+        console.warn('Failed to refresh CSRF token:', e);
+    }
+    return null;
 };
 
 const saveBulkNonFileConfigurations = async (group: string, changes: Array<{key: string, value: any, type: string}>) => {
@@ -229,29 +318,63 @@ const saveBulkNonFileConfigurations = async (group: string, changes: Array<{key:
         }))
     };
 
-    console.log('Saving bulk configurations:', payload); // Debug log
+    console.log('Saving bulk configurations:', payload);
 
-    const response = await fetch(`/api/system/configurations/bulk-update`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-        },
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        console.error('API Response Error:', errorData); // Debug log
-        throw new Error(errorData.message || 'Failed to save configurations');
+    let csrfToken = getCsrfToken();
+    if (!csrfToken) {
+        console.log('No CSRF token found, attempting to refresh...');
+        csrfToken = await refreshCsrfToken();
+        if (!csrfToken) {
+            throw new Error('CSRF token not found. Please refresh the page and try again.');
+        }
     }
+    
+    console.log('Bulk update CSRF token:', csrfToken);
 
-    const result = await response.json();
-    console.log('Save result:', result); // Debug log
-    return result;
+    const makeRequest = async (token: string) => {
+        const response = await fetch(`/api/system/configurations/bulk-update`, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': token,
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+            console.error('API Response Error:', {
+                status: response.status,
+                statusText: response.statusText,
+                data: errorData
+            });
+            
+            if (response.status === 419 || (errorData.message && errorData.message.includes('CSRF'))) {
+                throw new Error('CSRF_TOKEN_MISMATCH');
+            }
+            
+            throw new Error(errorData.message || 'Failed to save configurations');
+        }
+
+        return await response.json();
+    };
+
+    try {
+        return await makeRequest(csrfToken);
+    } catch (error) {
+        if (error.message === 'CSRF_TOKEN_MISMATCH') {
+            console.log('CSRF token mismatch, refreshing token and retrying...');
+            const newToken = await refreshCsrfToken();
+            if (newToken) {
+                return await makeRequest(newToken);
+            }
+            throw new Error('CSRF token mismatch. Please refresh the page and try again.');
+        }
+        throw error;
+    }
 };
 
 // Alias for backward compatibility

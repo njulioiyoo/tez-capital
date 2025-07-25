@@ -117,7 +117,7 @@ export function useNavigation() {
                 is_separator: item.is_separator || false,
             };
 
-            const response = await fetch('/api/system/configurations/menu-items', {
+            const response = await fetch('/api/system/menu/items', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -158,7 +158,7 @@ export function useNavigation() {
                 is_active: true,
             };
 
-            const response = await fetch(`/api/system/configurations/menu-items/${id}`, {
+            const response = await fetch(`/api/system/menu/items/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -185,7 +185,7 @@ export function useNavigation() {
     // Remove menu item
     const removeMenuItem = async (id: string) => {
         try {
-            const response = await fetch(`/api/system/configurations/menu-items/${id}`, {
+            const response = await fetch(`/api/system/menu/items/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -210,7 +210,7 @@ export function useNavigation() {
     // Reorder menu items
     const reorderMenuItems = async (items: { id: string; position: number }[]) => {
         try {
-            const response = await fetch('/api/system/configurations/menu-items/reorder', {
+            const response = await fetch('/api/system/menu/items/reorder', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

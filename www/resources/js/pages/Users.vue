@@ -114,6 +114,16 @@ const canPerformBulkAction = computed(() => {
 });
 
 // Methods
+const getCsrfToken = () => {
+    const tokenFromMeta = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const tokenFromCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1];
+    
+    return tokenFromMeta || (tokenFromCookie ? decodeURIComponent(tokenFromCookie) : '');
+};
+
 const resetForm = () => {
     formData.name = '';
     formData.email = '';
@@ -200,7 +210,7 @@ const saveUser = async () => {
         
         console.log('Sending request to:', url, 'with method:', method);
         
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const csrfToken = getCsrfToken();
         console.log('CSRF Token:', csrfToken);
         
         console.log('FormData being sent:', formData);
@@ -212,9 +222,10 @@ const saveUser = async () => {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken || '',
+                'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify(formData),
+            credentials: 'same-origin',
         });
         
         console.log('Response status:', response.status);
@@ -229,7 +240,10 @@ const saveUser = async () => {
             // Reload page to refresh data
             window.location.reload();
         } else {
-            if (data.errors) {
+            if (response.status === 419 || (data.message && data.message.includes('CSRF'))) {
+                alert('Session expired or CSRF token mismatch. Please refresh the page and try again.');
+                window.location.reload();
+            } else if (data.errors) {
                 errors.value = data.errors;
             } else {
                 console.error('Error saving user:', data.message);
@@ -253,8 +267,9 @@ const deleteUser = async (user: User) => {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-CSRF-TOKEN': getCsrfToken(),
             },
+            credentials: 'same-origin',
         });
         
         if (response.ok) {
@@ -275,8 +290,9 @@ const toggleUserStatus = async (user: User) => {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-CSRF-TOKEN': getCsrfToken(),
             },
+            credentials: 'same-origin',
         });
         
         if (response.ok) {
@@ -322,15 +338,20 @@ const performBulkAction = async () => {
             payload.role_id = parseInt(bulkActionRole.value);
         }
         
+        const csrfToken = getCsrfToken();
+        console.log('Bulk action CSRF token:', csrfToken);
+        console.log('Bulk action payload:', payload);
+        
         const response = await fetch('/api/system/users/bulk-action', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify(payload),
+            credentials: 'same-origin',
         });
         
         if (response.ok) {
@@ -340,7 +361,18 @@ const performBulkAction = async () => {
             window.location.reload();
         } else {
             const data = await response.json();
-            alert(data.message || 'Error performing bulk action');
+            console.error('Bulk action failed:', {
+                status: response.status,
+                statusText: response.statusText,
+                data: data
+            });
+            
+            if (response.status === 419 || (data.message && data.message.includes('CSRF'))) {
+                alert('Session expired or CSRF token mismatch. Please refresh the page and try again.');
+                window.location.reload();
+            } else {
+                alert(data.message || 'Error performing bulk action');
+            }
         }
     } catch (error) {
         console.error('Error performing bulk action:', error);
