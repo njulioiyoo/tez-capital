@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Auditable as AuditableTrait;
+use OwenIt\Auditing\Contracts\Auditable;
 
 class MenuItem extends Model implements Auditable
 {
@@ -75,7 +75,7 @@ class MenuItem extends Model implements Auditable
             'icon' => $this->icon,
             'position' => $this->position,
             'parent_id' => $this->parent_id ? (string) $this->parent_id : null,
-            'children' => $this->children->map(fn($child) => $child->toMenuArray())->toArray(),
+            'children' => $this->children->map(fn ($child) => $child->toMenuArray())->toArray(),
             'is_separator' => $this->is_separator,
             'badge' => $this->badge,
             'disabled' => $this->disabled,

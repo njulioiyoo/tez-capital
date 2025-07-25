@@ -5,8 +5,8 @@ namespace App\Http\Controllers\System\RolesPermissions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\System\RolesPermissions\RoleStoreRequest;
 use App\Http\Requests\System\RolesPermissions\RoleUpdateRequest;
-use App\Models\Role;
 use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -30,20 +30,20 @@ class RoleController extends Controller
     public function store(RoleStoreRequest $request): JsonResponse
     {
         $validated = $request->validated();
-        
+
         $role = Role::create([
             'name' => $validated['name'],
             'display_name' => $validated['display_name'] ?? null,
             'description' => $validated['description'] ?? null,
         ]);
-        
-        if (!empty($validated['permissions'])) {
+
+        if (! empty($validated['permissions'])) {
             $role->syncPermissions($validated['permissions']);
         }
 
         return response()->json([
             'message' => 'Role created successfully',
-            'data' => $role->load('permissions')
+            'data' => $role->load('permissions'),
         ], 201);
     }
 
@@ -53,7 +53,7 @@ class RoleController extends Controller
     public function show(Role $role): JsonResponse
     {
         return response()->json([
-            'data' => $role->load('permissions')
+            'data' => $role->load('permissions'),
         ]);
     }
 
@@ -63,18 +63,18 @@ class RoleController extends Controller
     public function update(RoleUpdateRequest $request, Role $role): JsonResponse
     {
         $validated = $request->validated();
-        
+
         $role->update([
             'name' => $validated['name'],
             'display_name' => $validated['display_name'] ?? null,
             'description' => $validated['description'] ?? null,
         ]);
-        
+
         $role->syncPermissions($validated['permissions'] ?? []);
 
         return response()->json([
             'message' => 'Role updated successfully',
-            'data' => $role->fresh()->load('permissions')
+            'data' => $role->fresh()->load('permissions'),
         ]);
     }
 
@@ -84,9 +84,9 @@ class RoleController extends Controller
     public function destroy(Role $role): JsonResponse
     {
         $role->delete();
-        
+
         return response()->json([
-            'message' => 'Role deleted successfully'
+            'message' => 'Role deleted successfully',
         ]);
     }
 }

@@ -32,7 +32,7 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-        
+
         // Update last login timestamp
         if (Auth::user()) {
             Auth::user()->updateLastLogin();

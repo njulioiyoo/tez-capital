@@ -15,13 +15,13 @@ class PermissionUpdateRequest extends FormRequest
     public function rules(): array
     {
         $permissionId = $this->route('permission');
-        
+
         return [
             'name' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('permissions', 'name')->ignore($permissionId)
+                Rule::unique('permissions', 'name')->ignore($permissionId),
             ],
             'display_name' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:500',

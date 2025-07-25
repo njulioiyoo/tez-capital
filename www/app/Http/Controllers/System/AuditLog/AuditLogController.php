@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\System\AuditLog;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use OwenIt\Auditing\Models\Audit;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use OwenIt\Auditing\Models\Audit;
 
 class AuditLogController extends Controller
 {
@@ -96,7 +96,7 @@ class AuditLogController extends Controller
             'today_audits' => Audit::whereDate('created_at', today())->count(),
             'this_week_audits' => Audit::whereBetween('created_at', [
                 now()->startOfWeek(),
-                now()->endOfWeek()
+                now()->endOfWeek(),
             ])->count(),
             'this_month_audits' => Audit::whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
@@ -147,10 +147,10 @@ class AuditLogController extends Controller
 
         // This would typically generate and return a download link
         // Implementation depends on your export requirements
-        
+
         return response()->json([
             'message' => 'Export functionality not yet implemented',
-            'download_url' => null
+            'download_url' => null,
         ]);
     }
 }

@@ -1,0 +1,29 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+    - ./vendor/tomasvotruba/unused-public/config/extension.neon
+    - ./vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+    level: 5
+    paths:
+        - app
+    checkUninitializedProperties: true
+    ignoreErrors:
+        # Laravel collection callbacks
+        - '#Parameter \#1 \$callback .* contains unresolvable type#'
+        # Carbon dates in models can return string|null
+        - '#Cannot call method format\(\) on string#'
+        - '#Cannot call method diffForHumans\(\) on string#'
+        # Audit package relations
+        - "#Relation 'user' is not found in OwenIt\\\\Auditing\\\\Models\\\\Audit model#"
+        # Higher order collection proxy properties
+        - '#Access to an undefined property.*HigherOrderCollectionProxy.*#'
+        # Custom model methods
+        - '#Call to an undefined method.*::toMenuArray\(\)#'
+        # Nullsafe operator warnings
+        - '#Using nullsafe property access.*is unnecessary#'
+        # All undefined property access (Laravel models with dynamic properties)
+        - '#Access to an undefined property.*#'
+    tmpDir: bootstrap/cache
+    checkOctaneCompatibility: true
+    checkModelProperties: true

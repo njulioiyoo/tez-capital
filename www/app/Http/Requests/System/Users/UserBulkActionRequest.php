@@ -18,7 +18,7 @@ class UserBulkActionRequest extends FormRequest
             'action' => [
                 'required',
                 'string',
-                Rule::in(['activate', 'deactivate', 'delete', 'assign_role'])
+                Rule::in(['activate', 'deactivate', 'delete', 'assign_role']),
             ],
             'user_ids' => 'required|array|min:1',
             'user_ids.*' => 'exists:users,id',

@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\System\Users;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\System\Users\UserBulkActionRequest;
 use App\Http\Requests\System\Users\UserStoreRequest;
 use App\Http\Requests\System\Users\UserUpdateRequest;
-use App\Http\Requests\System\Users\UserBulkActionRequest;
-use App\Models\User;
 use App\Models\Role;
-use Spatie\Permission\Models\Role as SpatieRole;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\Permission\Models\Role as SpatieRole;
 
 class UserController extends Controller
 {
@@ -108,7 +108,7 @@ class UserController extends Controller
         \Log::info('UserController store method called', [
             'url' => $request->url(),
             'method' => $request->method(),
-            'data' => $request->all()
+            'data' => $request->all(),
         ]);
 
         $validated = $request->validated();
@@ -120,7 +120,7 @@ class UserController extends Controller
         $user = User::create($validated);
 
         // Assign roles if provided
-        if (!empty($validated['roles'])) {
+        if (! empty($validated['roles'])) {
             // Get role names from IDs
             $roleNames = SpatieRole::whereIn('id', $validated['roles'])->pluck('name')->toArray();
             $user->syncRoles($roleNames);
@@ -128,7 +128,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'User created successfully',
-            'data' => $user->load('roles')
+            'data' => $user->load('roles'),
         ], 201);
     }
 
@@ -157,7 +157,7 @@ class UserController extends Controller
                 'last_login_at' => $user->last_login_at?->format('Y-m-d H:i:s'),
                 'created_at' => $user->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $user->updated_at->format('Y-m-d H:i:s'),
-            ]
+            ],
         ]);
     }
 
@@ -170,7 +170,7 @@ class UserController extends Controller
             'url' => $request->url(),
             'method' => $request->method(),
             'user_id' => $user->id,
-            'data' => $request->all()
+            'data' => $request->all(),
         ]);
 
         $validated = $request->validated();
@@ -179,19 +179,18 @@ class UserController extends Controller
         \Log::info('Roles from validated data:', $validated['roles'] ?? 'not present');
 
         // Hash password if provided
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);
         }
-
 
         // Update user
         $user->update($validated);
 
         // Sync roles if provided
         if (array_key_exists('roles', $validated)) {
-            if (!empty($validated['roles'])) {
+            if (! empty($validated['roles'])) {
                 // Get role names from IDs
                 $roleNames = SpatieRole::whereIn('id', $validated['roles'])->pluck('name')->toArray();
                 $user->syncRoles($roleNames);
@@ -202,7 +201,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'User updated successfully',
-            'data' => $user->fresh()->load('roles')
+            'data' => $user->fresh()->load('roles'),
         ]);
     }
 
@@ -214,14 +213,14 @@ class UserController extends Controller
         // Prevent deleting self
         if ($user->id === auth()->id()) {
             return response()->json([
-                'message' => 'You cannot delete your own account'
+                'message' => 'You cannot delete your own account',
             ], 422);
         }
 
         $user->delete();
 
         return response()->json([
-            'message' => 'User deleted successfully'
+            'message' => 'User deleted successfully',
         ]);
     }
 
@@ -237,7 +236,7 @@ class UserController extends Controller
         // Prevent action on self
         if (in_array(auth()->id(), $userIds)) {
             return response()->json([
-                'message' => 'You cannot perform this action on your own account'
+                'message' => 'You cannot perform this action on your own account',
             ], 422);
         }
 
@@ -281,7 +280,7 @@ class UserController extends Controller
         };
 
         return response()->json([
-            'message' => "{$affectedCount} users {$actionText} successfully"
+            'message' => "{$affectedCount} users {$actionText} successfully",
         ]);
     }
 
@@ -293,18 +292,18 @@ class UserController extends Controller
         // Prevent toggling self
         if ($user->id === auth()->id()) {
             return response()->json([
-                'message' => 'You cannot change your own status'
+                'message' => 'You cannot change your own status',
             ], 422);
         }
 
-        $user->update(['status' => !$user->status]);
+        $user->update(['status' => ! $user->status]);
 
         return response()->json([
             'message' => 'User status updated successfully',
             'data' => [
                 'status' => $user->status,
-                'status_text' => $user->status_text
-            ]
+                'status_text' => $user->status_text,
+            ],
         ]);
     }
 

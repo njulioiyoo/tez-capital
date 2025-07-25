@@ -16,9 +16,9 @@ class PermissionController extends Controller
     public function index(): JsonResponse
     {
         $permissions = Permission::orderBy('group')->orderBy('name')->get();
-        
+
         return response()->json([
-            'data' => $permissions
+            'data' => $permissions,
         ]);
     }
 
@@ -31,7 +31,7 @@ class PermissionController extends Controller
 
         return response()->json([
             'message' => 'Permission created successfully',
-            'data' => $permission
+            'data' => $permission,
         ], 201);
     }
 
@@ -41,7 +41,7 @@ class PermissionController extends Controller
     public function show(Permission $permission): JsonResponse
     {
         return response()->json([
-            'data' => $permission
+            'data' => $permission,
         ]);
     }
 
@@ -54,7 +54,7 @@ class PermissionController extends Controller
 
         return response()->json([
             'message' => 'Permission updated successfully',
-            'data' => $permission->fresh()
+            'data' => $permission->fresh(),
         ]);
     }
 
@@ -64,9 +64,9 @@ class PermissionController extends Controller
     public function destroy(Permission $permission): JsonResponse
     {
         $permission->delete();
-        
+
         return response()->json([
-            'message' => 'Permission deleted successfully'
+            'message' => 'Permission deleted successfully',
         ]);
     }
 }

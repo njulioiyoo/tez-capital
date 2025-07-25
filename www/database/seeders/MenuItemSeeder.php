@@ -26,7 +26,7 @@ class MenuItemSeeder extends Seeder
                 'parent_id' => null,
                 'is_active' => true,
             ],
-            
+
             // Reports parent
             [
                 'title' => 'Report',
@@ -36,7 +36,7 @@ class MenuItemSeeder extends Seeder
                 'parent_id' => null,
                 'is_active' => true,
             ],
-            
+
             // Analytics under Reports
             [
                 'title' => 'Analytics',
@@ -46,7 +46,7 @@ class MenuItemSeeder extends Seeder
                 'parent_id' => null, // Will be updated after Report is created
                 'is_active' => true,
             ],
-            
+
             // Financial Reports under Reports
             [
                 'title' => 'Financial Reports',
@@ -56,7 +56,7 @@ class MenuItemSeeder extends Seeder
                 'parent_id' => null, // Will be updated after Report is created
                 'is_active' => true,
             ],
-            
+
             // Separator
             [
                 'title' => '',
@@ -67,7 +67,7 @@ class MenuItemSeeder extends Seeder
                 'is_separator' => true,
                 'is_active' => true,
             ],
-            
+
             // System parent
             [
                 'title' => 'System',
@@ -77,7 +77,7 @@ class MenuItemSeeder extends Seeder
                 'parent_id' => null,
                 'is_active' => true,
             ],
-            
+
             // User under System
             [
                 'title' => 'Users',
@@ -87,7 +87,7 @@ class MenuItemSeeder extends Seeder
                 'parent_id' => null, // Will be updated after System is created
                 'is_active' => true,
             ],
-            
+
             // Roles & Permissions under System
             [
                 'title' => 'Roles & Permissions',
@@ -97,7 +97,7 @@ class MenuItemSeeder extends Seeder
                 'parent_id' => null, // Will be updated after System is created
                 'is_active' => true,
             ],
-            
+
             // Menu under System
             [
                 'title' => 'Menu',
@@ -107,7 +107,7 @@ class MenuItemSeeder extends Seeder
                 'parent_id' => null, // Will be updated after System is created
                 'is_active' => true,
             ],
-            
+
             // Audit Log under System
             [
                 'title' => 'Audit Log',
@@ -117,7 +117,7 @@ class MenuItemSeeder extends Seeder
                 'parent_id' => null, // Will be updated after System is created
                 'is_active' => true,
             ],
-            
+
             // Configuration under System
             [
                 'title' => 'Configuration',
@@ -131,13 +131,13 @@ class MenuItemSeeder extends Seeder
 
         // Create menu items and track IDs for parent relationships
         $createdItems = [];
-        
+
         // First pass: create all items
         foreach ($menuItems as $item) {
             $createdItem = MenuItem::create($item);
             $createdItems[$item['title']] = $createdItem;
         }
-        
+
         // Second pass: update parent relationships
         // Update Report children
         if (isset($createdItems['Report'])) {
@@ -148,7 +148,7 @@ class MenuItemSeeder extends Seeder
                 $createdItems['Financial Reports']->update(['parent_id' => $createdItems['Report']->id]);
             }
         }
-        
+
         // Update System children
         if (isset($createdItems['System'])) {
             if (isset($createdItems['Users'])) {

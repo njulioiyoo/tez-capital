@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\System\Configurations;
+namespace App\Http\Controllers\System\Menu;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\System\Configurations\MenuItemStoreRequest;
-use App\Http\Requests\System\Configurations\MenuItemUpdateRequest;
-use App\Http\Requests\System\Configurations\MenuItemReorderRequest;
+use App\Http\Requests\System\Menu\MenuItemReorderRequest;
+use App\Http\Requests\System\Menu\MenuItemStoreRequest;
+use App\Http\Requests\System\Menu\MenuItemUpdateRequest;
 use App\Models\MenuItem;
 use Illuminate\Http\JsonResponse;
 
@@ -17,9 +17,9 @@ class MenuController extends Controller
     public function index(): JsonResponse
     {
         $menuItems = MenuItem::getMenuTree();
-        
+
         return response()->json([
-            'data' => $menuItems->map(fn($item) => $item->toMenuArray())
+            'data' => $menuItems->map(fn ($item) => $item->toMenuArray()),
         ]);
     }
 
@@ -29,9 +29,9 @@ class MenuController extends Controller
     public function all(): JsonResponse
     {
         $menuItems = MenuItem::active()->ordered()->get();
-        
+
         return response()->json([
-            'data' => $menuItems
+            'data' => $menuItems,
         ]);
     }
 
@@ -44,7 +44,7 @@ class MenuController extends Controller
 
         return response()->json([
             'message' => 'Menu item created successfully',
-            'data' => $menuItem->toMenuArray()
+            'data' => $menuItem->toMenuArray(),
         ], 201);
     }
 
@@ -54,7 +54,7 @@ class MenuController extends Controller
     public function show(MenuItem $menuItem): JsonResponse
     {
         return response()->json([
-            'data' => $menuItem->toMenuArray()
+            'data' => $menuItem->toMenuArray(),
         ]);
     }
 
@@ -67,7 +67,7 @@ class MenuController extends Controller
 
         return response()->json([
             'message' => 'Menu item updated successfully',
-            'data' => $menuItem->fresh()->toMenuArray()
+            'data' => $menuItem->fresh()->toMenuArray(),
         ]);
     }
 
@@ -79,7 +79,7 @@ class MenuController extends Controller
         $menuItem->delete();
 
         return response()->json([
-            'message' => 'Menu item deleted successfully'
+            'message' => 'Menu item deleted successfully',
         ]);
     }
 
@@ -96,7 +96,7 @@ class MenuController extends Controller
         }
 
         return response()->json([
-            'message' => 'Menu items reordered successfully'
+            'message' => 'Menu items reordered successfully',
         ]);
     }
 }

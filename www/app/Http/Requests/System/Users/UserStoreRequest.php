@@ -18,14 +18,14 @@ class UserStoreRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|max:255',
             'password' => [
-                'required', 
-                'string', 
+                'required',
+                'string',
                 'confirmed',
                 Password::min(8)
                     ->letters()
                     ->mixedCase()
                     ->numbers()
-                    ->symbols()
+                    ->symbols(),
             ],
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
