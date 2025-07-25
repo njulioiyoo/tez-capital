@@ -192,7 +192,7 @@ const saveMenuItem = async () => {
         toast({
             title: 'Error',
             description: 'Failed to save menu item',
-            variant: 'destructive'
+            variant: 'error'
         });
     }
 };

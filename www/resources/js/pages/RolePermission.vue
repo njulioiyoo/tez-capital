@@ -96,10 +96,28 @@ const saveRole = async () => {
         
         if (response.ok) {
             roleDialogOpen.value = false;
-            window.location.reload();
+            toast({
+                title: 'Success',
+                description: editingRole.value ? 'Role updated successfully' : 'Role created successfully',
+                variant: 'success'
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            toast({
+                title: 'Error',
+                description: 'Failed to save role',
+                variant: 'error'
+            });
         }
     } catch (error) {
         console.error('Error saving role:', error);
+        toast({
+            title: 'Error',
+            description: 'Failed to save role',
+            variant: 'error'
+        });
     }
 };
 
@@ -119,10 +137,28 @@ const savePermission = async () => {
         
         if (response.ok) {
             permissionDialogOpen.value = false;
-            window.location.reload();
+            toast({
+                title: 'Success',
+                description: editingPermission.value ? 'Permission updated successfully' : 'Permission created successfully',
+                variant: 'success'
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            toast({
+                title: 'Error',
+                description: 'Failed to save permission',
+                variant: 'error'
+            });
         }
     } catch (error) {
         console.error('Error saving permission:', error);
+        toast({
+            title: 'Error',
+            description: 'Failed to save permission',
+            variant: 'error'
+        });
     }
 };
 
@@ -196,7 +232,7 @@ const confirmDelete = async () => {
         toast({
             title: 'Error',
             description: `Failed to delete ${confirmDialog.value.type}`,
-            variant: 'destructive'
+            variant: 'error'
         });
     } finally {
         confirmDialog.value.loading = false;
