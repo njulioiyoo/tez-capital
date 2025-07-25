@@ -67,6 +67,9 @@ class Configuration extends Model implements Auditable
         return $config->getValue();
     }
 
+    /**
+     * @api
+     */
     public static function set(string $key, $value, string $type = self::TYPE_STRING, string $group = self::GROUP_GENERAL): void
     {
         static::updateOrCreate(

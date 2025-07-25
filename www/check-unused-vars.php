@@ -17,7 +17,9 @@ function checkUnusedVariables($file)
         }
 
         // Look for variable assignments like $someVar = 'value';
-        if (preg_match('/\$(\w+)\s*=/', $line, $matches)) {
+        // But skip class properties (protected/private/public $var)
+        if (preg_match('/\$(\w+)\s*=/', $line, $matches) &&
+            ! preg_match('/^\s*(protected|private|public)\s+\$/', $line)) {
             $varName = $matches[1];
             $varPattern = '/\$'.preg_quote($varName, '/').'\b/';
 

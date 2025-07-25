@@ -124,7 +124,7 @@ class AuditLogController extends Controller
                     return [
                         'event' => $audit->event,
                         'model' => class_basename($audit->auditable_type),
-                        'user' => $audit->user?->name ?? 'System',
+                        'user' => $audit->user->name ?? 'System',
                         'created_at' => $audit->created_at->diffForHumans(),
                     ];
                 }),
