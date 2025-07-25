@@ -127,7 +127,7 @@ class Configuration extends Model implements Auditable
                         'description' => $config->description,
                         'is_public' => $config->is_public,
                     ]];
-                });
+                })->all();
             })
             ->toArray();
     }

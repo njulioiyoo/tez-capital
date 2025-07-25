@@ -14,8 +14,6 @@ class ConfigurationController extends Controller
 {
     public function index(): JsonResponse
     {
-        $unUsedVar = 'This variable is not used anywhere in the code'; // This variable is not used anywhere in the code
-
         $configurations = Configuration::getAllGrouped();
 
         return response()->json([
