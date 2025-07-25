@@ -30,26 +30,41 @@ class MenuItem extends Model implements Auditable
         'is_active' => 'boolean',
     ];
 
+    /**
+     * @api
+     */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(MenuItem::class, 'parent_id');
     }
 
+    /**
+     * @api
+     */
     public function children(): HasMany
     {
         return $this->hasMany(MenuItem::class, 'parent_id')->orderBy('position');
     }
 
+    /**
+     * @api
+     */
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
 
+    /**
+     * @api
+     */
     public function scopeRootItems($query)
     {
         return $query->whereNull('parent_id');
     }
 
+    /**
+     * @api
+     */
     public function scopeOrdered($query)
     {
         return $query->orderBy('position');
@@ -74,7 +89,7 @@ class MenuItem extends Model implements Auditable
             'href' => $this->href,
             'icon' => $this->icon,
             'position' => $this->position,
-            'parent_id' => $this->parent_id ? (string) $this->parent_id : null,
+            'parent_id' => $this->parent_id !== null ? (string) $this->parent_id : null,
             'children' => $this->children->map(fn ($child) => $child->toMenuArray())->toArray(),
             'is_separator' => $this->is_separator,
             'badge' => $this->badge,

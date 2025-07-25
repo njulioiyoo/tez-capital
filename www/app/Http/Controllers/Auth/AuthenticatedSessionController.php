@@ -15,6 +15,8 @@ class AuthenticatedSessionController extends Controller
 {
     /**
      * Show the login page.
+     *
+     * @api
      */
     public function create(Request $request): Response
     {
@@ -26,6 +28,8 @@ class AuthenticatedSessionController extends Controller
 
     /**
      * Handle an incoming authentication request.
+     *
+     * @api
      */
     public function store(LoginRequest $request): RedirectResponse
     {
@@ -34,7 +38,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         // Update last login timestamp
-        if (Auth::user()) {
+        if (Auth::user() !== null) {
             Auth::user()->updateLastLogin();
         }
 
@@ -43,6 +47,8 @@ class AuthenticatedSessionController extends Controller
 
     /**
      * Destroy an authenticated session.
+     *
+     * @api
      */
     public function destroy(Request $request): RedirectResponse
     {
