@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from '@/components/ui/toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
     Plus, 
@@ -237,12 +238,26 @@ const saveUser = async () => {
         if (response.ok) {
             isDialogOpen.value = false;
             resetForm();
+            
+            toast({
+                title: 'Success',
+                description: editingUser.value ? 'User updated successfully' : 'User created successfully'
+            });
+            
             // Reload page to refresh data
-            window.location.reload();
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } else {
             if (response.status === 419 || (data.message && data.message.includes('CSRF'))) {
-                alert('Session expired or CSRF token mismatch. Please refresh the page and try again.');
-                window.location.reload();
+                toast({
+                    title: 'Session Expired',
+                    description: 'Your session has expired. The page will reload automatically.',
+                    variant: 'destructive'
+                });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             } else if (data.errors) {
                 errors.value = data.errors;
             } else {
@@ -273,10 +288,20 @@ const deleteUser = async (user: User) => {
         });
         
         if (response.ok) {
-            window.location.reload();
+            toast({
+                title: 'Success',
+                description: 'User deleted successfully'
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } else {
             const data = await response.json();
-            alert(data.message || 'Error deleting user');
+            toast({
+                title: 'Error',
+                description: data.message || 'Error deleting user',
+                variant: 'destructive'
+            });
         }
     } catch (error) {
         console.error('Error deleting user:', error);
@@ -296,10 +321,20 @@ const toggleUserStatus = async (user: User) => {
         });
         
         if (response.ok) {
-            window.location.reload();
+            toast({
+                title: 'Success',
+                description: `User status updated successfully`
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } else {
             const data = await response.json();
-            alert(data.message || 'Error updating user status');
+            toast({
+                title: 'Error',
+                description: data.message || 'Error updating user status',
+                variant: 'destructive'
+            });
         }
     } catch (error) {
         console.error('Error updating user status:', error);
@@ -358,7 +393,15 @@ const performBulkAction = async () => {
             selectedUsers.value = [];
             bulkAction.value = '';
             bulkActionRole.value = '';
-            window.location.reload();
+            
+            toast({
+                title: 'Success',
+                description: 'Bulk action completed successfully'
+            });
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } else {
             const data = await response.json();
             console.error('Bulk action failed:', {
@@ -368,10 +411,20 @@ const performBulkAction = async () => {
             });
             
             if (response.status === 419 || (data.message && data.message.includes('CSRF'))) {
-                alert('Session expired or CSRF token mismatch. Please refresh the page and try again.');
-                window.location.reload();
+                toast({
+                    title: 'Session Expired',
+                    description: 'Your session has expired. The page will reload automatically.',
+                    variant: 'destructive'
+                });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             } else {
-                alert(data.message || 'Error performing bulk action');
+                toast({
+                    title: 'Error',
+                    description: data.message || 'Error performing bulk action',
+                    variant: 'destructive'
+                });
             }
         }
     } catch (error) {
