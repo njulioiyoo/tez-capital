@@ -14,6 +14,7 @@ import {
     CreditCard, 
     Wrench, 
     Phone,
+    Globe,
     Save,
     RefreshCw
 } from 'lucide-vue-next';
@@ -23,6 +24,7 @@ import HomepageSettings from '@/components/configurations/HomepageSettings.vue';
 import CreditSettings from '@/components/configurations/CreditSettings.vue';
 import MaintenanceSettings from '@/components/configurations/MaintenanceSettings.vue';
 import ContactSettings from '@/components/configurations/ContactSettings.vue';
+import LanguageSettings from '@/components/configurations/LanguageSettings.vue';
 
 interface Configuration {
     [key: string]: {
@@ -452,7 +454,7 @@ onMounted(() => {
                     </CardHeader>
                     <CardContent>
                         <Tabs v-model:modelValue="activeTab" class="w-full">
-                            <TabsList class="grid w-full grid-cols-6">
+                            <TabsList class="grid w-full grid-cols-7">
                                 <TabsTrigger value="general" class="flex items-center gap-2">
                                     <Settings class="w-4 h-4" />
                                     General
@@ -476,6 +478,10 @@ onMounted(() => {
                                 <TabsTrigger value="contact" class="flex items-center gap-2">
                                     <Phone class="w-4 h-4" />
                                     Contact
+                                </TabsTrigger>
+                                <TabsTrigger value="language" class="flex items-center gap-2">
+                                    <Globe class="w-4 h-4" />
+                                    Language
                                 </TabsTrigger>
                             </TabsList>
 
@@ -538,6 +544,17 @@ onMounted(() => {
                                 <TabsContent value="contact" class="space-y-4">
                                     <ContactSettings 
                                         :configurations="configurations.contact || {}"
+                                        :is-loading="isLoading"
+                                        :is-saving="isSaving"
+                                        @save="saveConfiguration"
+                                        @update="updateConfiguration"
+                                        @bulk-save="saveBulkConfigurations"
+                                    />
+                                </TabsContent>
+
+                                <TabsContent value="language" class="space-y-4">
+                                    <LanguageSettings 
+                                        :configurations="configurations.language || {}"
                                         :is-loading="isLoading"
                                         :is-saving="isSaving"
                                         @save="saveConfiguration"

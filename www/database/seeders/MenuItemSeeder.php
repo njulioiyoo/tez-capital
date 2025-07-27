@@ -121,10 +121,41 @@ class MenuItemSeeder extends Seeder
             // Configuration under System
             [
                 'title' => 'Configuration',
-                'href' => '/configuration',
+                'href' => '/configurations',
                 'icon' => 'Settings',
                 'position' => 5,
                 'parent_id' => null, // Will be updated after System is created
+                'is_active' => true,
+            ],
+
+            // Separator
+            [
+                'title' => '',
+                'href' => null,
+                'icon' => null,
+                'position' => 5,
+                'parent_id' => null,
+                'is_separator' => true,
+                'is_active' => true,
+            ],
+
+            // Content parent
+            [
+                'title' => 'Content',
+                'href' => null,
+                'icon' => 'FileText',
+                'position' => 6,
+                'parent_id' => null,
+                'is_active' => true,
+            ],
+
+            // Education under Content
+            [
+                'title' => 'Education',
+                'href' => '/education',
+                'icon' => 'GraduationCap',
+                'position' => 1,
+                'parent_id' => null, // Will be updated after Content is created
                 'is_active' => true,
             ],
         ];
@@ -165,6 +196,13 @@ class MenuItemSeeder extends Seeder
             }
             if (isset($createdItems['Configuration'])) {
                 $createdItems['Configuration']->update(['parent_id' => $createdItems['System']->id]);
+            }
+        }
+
+        // Update Content children
+        if (isset($createdItems['Content'])) {
+            if (isset($createdItems['Education'])) {
+                $createdItems['Education']->update(['parent_id' => $createdItems['Content']->id]);
             }
         }
     }

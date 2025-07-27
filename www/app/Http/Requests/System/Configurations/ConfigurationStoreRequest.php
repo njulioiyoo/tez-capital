@@ -16,7 +16,7 @@ class ConfigurationStoreRequest extends FormRequest
         $rules = [
             'key' => 'required|string|max:255',
             'type' => 'required|in:string,text,integer,boolean,json,file,email,url',
-            'group' => 'required|in:general,branding,homepage,credit,maintenance,contact',
+            'group' => 'required|in:general,branding,homepage,credit,maintenance,contact,language',
             'description' => 'nullable|string|max:500',
             'is_public' => 'boolean',
         ];
