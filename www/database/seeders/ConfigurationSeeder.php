@@ -38,6 +38,14 @@ class ConfigurationSeeder extends Seeder
 
             // Branding
             [
+                'key' => 'company_name',
+                'value' => 'Tez Capital Dashboard',
+                'type' => 'string',
+                'group' => 'branding',
+                'description' => 'Company name',
+                'is_public' => true,
+            ],
+            [
                 'key' => 'company_logo',
                 'value' => null,
                 'type' => 'file',
@@ -203,6 +211,40 @@ class ConfigurationSeeder extends Seeder
                 'type' => 'json',
                 'group' => 'contact',
                 'description' => 'Social media links',
+                'is_public' => true,
+            ],
+
+            // Language Settings (Bilingual: Indonesian & English)
+            [
+                'key' => 'bilingual_enabled',
+                'value' => false,
+                'type' => 'boolean',
+                'group' => 'language',
+                'description' => 'Enable bilingual support (Indonesian & English)',
+                'is_public' => true,
+            ],
+            [
+                'key' => 'default_language',
+                'value' => 'id',
+                'type' => 'string',
+                'group' => 'language',
+                'description' => 'Default application language (id/en)',
+                'is_public' => true,
+            ],
+            [
+                'key' => 'language_switcher_enabled',
+                'value' => true,
+                'type' => 'boolean',
+                'group' => 'language',
+                'description' => 'Show language switcher in frontend',
+                'is_public' => true,
+            ],
+            [
+                'key' => 'auto_detect_language',
+                'value' => false,
+                'type' => 'boolean',
+                'group' => 'language',
+                'description' => 'Auto-detect user language from browser',
                 'is_public' => true,
             ],
         ];

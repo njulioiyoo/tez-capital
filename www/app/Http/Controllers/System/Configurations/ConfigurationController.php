@@ -133,7 +133,7 @@ class ConfigurationController extends Controller
             'configurations.*.key' => 'required|string',
             'configurations.*.value' => 'nullable',
             'configurations.*.type' => 'required|in:string,text,integer,boolean,json,file,email,url',
-            'configurations.*.group' => 'required|in:general,branding,homepage,credit,maintenance,contact',
+            'configurations.*.group' => 'required|in:general,branding,homepage,credit,maintenance,contact,language',
         ]);
 
         $configurations = $request->input('configurations');

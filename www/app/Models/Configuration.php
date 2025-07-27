@@ -40,6 +40,8 @@ class Configuration extends Model implements Auditable
 
     const GROUP_CONTACT = 'contact';
 
+    const GROUP_LANGUAGE = 'language';
+
     const TYPE_STRING = 'string';
 
     const TYPE_TEXT = 'text';
@@ -92,7 +94,7 @@ class Configuration extends Model implements Auditable
             case self::TYPE_JSON:
                 return is_string($this->value) ? json_decode($this->value, true) : $this->value;
             case self::TYPE_FILE:
-                return $this->value ? Storage::url($this->value) : null;
+                return $this->value ? Storage::disk('public')->url($this->value) : null;
             default:
                 return $this->value;
         }

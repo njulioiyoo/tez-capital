@@ -29,6 +29,7 @@ const emit = defineEmits<{
     bulkSave: [group: string, changes: Array<{key: string, value: any, type: string}>];
 }>();
 
+const companyName = ref<string>('');
 const logoFile = ref<File | null>(null);
 const logoPreview = ref<string>('');
 const logoDarkFile = ref<File | null>(null);
@@ -39,6 +40,7 @@ const faviconPreview = ref<string>('');
 // Watch for configuration changes and update previews
 watch(() => props.configurations, (newConfigs) => {
     if (newConfigs) {
+        companyName.value = newConfigs.company_name?.value || 'Tez Capital Dashboard';
         logoPreview.value = newConfigs.company_logo?.value || '';
         logoDarkPreview.value = newConfigs.company_logo_dark?.value || '';
         faviconPreview.value = newConfigs.favicon?.value || '';
@@ -102,11 +104,17 @@ const clearFavicon = () => {
 const saveSettings = () => {
     const changes = [];
 
-    // Check for file changes and collect them
+    // Check for changes and collect them
     console.log('Checking branding changes:');
+    console.log('Company name:', companyName.value);
     console.log('Logo file:', logoFile.value);
     console.log('Dark logo file:', logoDarkFile.value);
     console.log('Favicon file:', faviconFile.value);
+
+    // Check company name changes
+    if (companyName.value !== (props.configurations.company_name?.value || 'Tez Capital Dashboard')) {
+        changes.push({ key: 'company_name', value: companyName.value, type: 'string' });
+    }
 
     if (logoFile.value) {
         changes.push({ key: 'company_logo', value: logoFile.value, type: 'file' });
@@ -136,7 +144,8 @@ const saveSettings = () => {
 };
 
 const hasChanges = () => {
-    return logoFile.value || logoDarkFile.value || faviconFile.value;
+    const nameChanged = companyName.value !== (props.configurations.company_name?.value || 'Tez Capital Dashboard');
+    return nameChanged || logoFile.value || logoDarkFile.value || faviconFile.value;
 };
 </script>
 
@@ -149,6 +158,20 @@ const hasChanges = () => {
             </CardDescription>
         </CardHeader>
         <CardContent class="space-y-6">
+            <!-- Company Name -->
+            <div class="space-y-2">
+                <Label for="company_name">Company Name</Label>
+                <Input 
+                    id="company_name"
+                    v-model="companyName"
+                    placeholder="Enter company name"
+                    class="w-full"
+                />
+                <p class="text-sm text-muted-foreground">
+                    Name displayed in login page and sidebar
+                </p>
+            </div>
+
             <!-- Company Logo -->
             <div class="space-y-4">
                 <div class="space-y-2">
