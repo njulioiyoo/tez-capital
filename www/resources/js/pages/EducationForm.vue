@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import RichTextEditor from '@/components/ui/RichTextEditor.vue';
 import { Select } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -328,13 +329,12 @@ const goBack = () => {
 
                                 <div>
                                     <Label for="content_id">Content (Indonesian)</Label>
-                                    <Textarea
-                                        id="content_id"
+                                    <RichTextEditor
                                         v-model="form.content_id"
-                                        placeholder="Enter Indonesian content (HTML supported)"
-                                        rows="8"
+                                        placeholder="Enter Indonesian content..."
+                                        :height="500"
                                     />
-                                    <p class="text-sm text-gray-500 mt-1">You can use HTML tags for formatting</p>
+                                    <p class="text-sm text-gray-500 mt-1">Use the rich text editor to format your content</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -373,13 +373,12 @@ const goBack = () => {
 
                                 <div>
                                     <Label for="content_en">Content (English)</Label>
-                                    <Textarea
-                                        id="content_en"
+                                    <RichTextEditor
                                         v-model="form.content_en"
-                                        placeholder="Enter English content (HTML supported)"
-                                        rows="8"
+                                        placeholder="Enter English content..."
+                                        :height="500"
                                     />
-                                    <p class="text-sm text-gray-500 mt-1">You can use HTML tags for formatting</p>
+                                    <p class="text-sm text-gray-500 mt-1">Use the rich text editor to format your content</p>
                                 </div>
                             </CardContent>
                         </Card>

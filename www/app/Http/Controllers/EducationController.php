@@ -324,4 +324,28 @@ class EducationController extends Controller
             'view_count' => $education->view_count,
         ]);
     }
+
+    /**
+     * Upload image for TinyMCE editor
+     */
+    public function uploadImage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+        ]);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = $file->store('education/images', 'public');
+
+            return response()->json([
+                'url' => Storage::disk('public')->url($path),
+                'path' => $path,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'No file uploaded',
+        ], 400);
+    }
 }

@@ -121,6 +121,7 @@ Route::prefix('api')->group(function () {
                 Route::delete('{education}', [EducationController::class, 'destroy'])->name('destroy');
                 Route::post('bulk-action', [EducationController::class, 'bulkAction'])->name('bulk-action');
                 Route::post('{education}/view', [EducationController::class, 'updateViewCount'])->name('view');
+                Route::post('upload-image', [EducationController::class, 'uploadImage'])->name('upload-image');
             });
         });
 

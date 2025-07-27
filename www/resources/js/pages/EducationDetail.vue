@@ -329,7 +329,7 @@ updateViewCount();
                     </CardHeader>
                     <CardContent>
                         <div 
-                            class="prose prose-lg max-w-none"
+                            class="prose prose-lg"
                             v-html="currentContent"
                         ></div>
                     </CardContent>
