@@ -189,7 +189,7 @@ const iconOptions = [
                         v-model="form.hero_subtitle"
                         placeholder="Enter hero subtitle"
                         :disabled="isLoading"
-                        rows="3"
+                        :rows="3"
                     />
                 </div>
             </CardContent>
@@ -268,7 +268,7 @@ const iconOptions = [
                                     v-model="banner.subtitle"
                                     placeholder="Enter banner subtitle"
                                     :disabled="isLoading"
-                                    rows="2"
+                                    :rows="2"
                                 />
                             </div>
 
@@ -338,7 +338,7 @@ const iconOptions = [
                                 v-model="feature.description"
                                 placeholder="Enter feature description"
                                 :disabled="isLoading"
-                                rows="2"
+                                :rows="2"
                             />
                         </div>
                     </div>

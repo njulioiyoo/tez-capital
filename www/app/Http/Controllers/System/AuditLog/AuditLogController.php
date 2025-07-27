@@ -16,7 +16,7 @@ class AuditLogController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('AuditLog');
+        return Inertia::render('system/audit-log/AuditLog');
     }
 
     /**

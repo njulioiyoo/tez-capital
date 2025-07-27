@@ -181,7 +181,9 @@ const loadUserDetails = async (userId: number) => {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': getCsrfToken(),
             },
+            credentials: 'include',
         });
         
         if (response.ok) {
@@ -226,7 +228,7 @@ const saveUser = async () => {
                 'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify(formData),
-            credentials: 'same-origin',
+            credentials: 'include',
         });
         
         console.log('Response status:', response.status);
@@ -285,7 +287,7 @@ const deleteUser = async (user: User) => {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRF-TOKEN': getCsrfToken(),
             },
-            credentials: 'same-origin',
+            credentials: 'include',
         });
         
         if (response.ok) {
@@ -319,7 +321,7 @@ const toggleUserStatus = async (user: User) => {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRF-TOKEN': getCsrfToken(),
             },
-            credentials: 'same-origin',
+            credentials: 'include',
         });
         
         if (response.ok) {
@@ -389,7 +391,7 @@ const performBulkAction = async () => {
                 'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify(payload),
-            credentials: 'same-origin',
+            credentials: 'include',
         });
         
         if (response.ok) {
@@ -549,7 +551,7 @@ const clearFilters = () => {
                                         id="address" 
                                         v-model="formData.address" 
                                         class="w-full p-2 border rounded-md"
-                                        rows="3"
+                                        :rows="3"
                                         placeholder="Address (optional)"
                                         :class="errors.address ? 'border-red-500' : ''"
                                     ></textarea>

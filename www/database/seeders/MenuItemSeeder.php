@@ -81,7 +81,7 @@ class MenuItemSeeder extends Seeder
             // User under System
             [
                 'title' => 'Users',
-                'href' => '/users',
+                'href' => '/system/users',
                 'icon' => 'Users',
                 'position' => 1,
                 'parent_id' => null, // Will be updated after System is created
@@ -91,7 +91,7 @@ class MenuItemSeeder extends Seeder
             // Roles & Permissions under System
             [
                 'title' => 'Roles & Permissions',
-                'href' => '/roles',
+                'href' => '/system/roles',
                 'icon' => 'Shield',
                 'position' => 2,
                 'parent_id' => null, // Will be updated after System is created
@@ -101,7 +101,7 @@ class MenuItemSeeder extends Seeder
             // Menu under System
             [
                 'title' => 'Menu',
-                'href' => '/menu-manager',
+                'href' => '/system/menu',
                 'icon' => 'FileText',
                 'position' => 3,
                 'parent_id' => null, // Will be updated after System is created
@@ -111,7 +111,7 @@ class MenuItemSeeder extends Seeder
             // Audit Log under System
             [
                 'title' => 'Audit Log',
-                'href' => '/audit-log',
+                'href' => '/system/audit-log',
                 'icon' => 'Activity',
                 'position' => 4,
                 'parent_id' => null, // Will be updated after System is created
@@ -121,7 +121,7 @@ class MenuItemSeeder extends Seeder
             // Configuration under System
             [
                 'title' => 'Configuration',
-                'href' => '/configurations',
+                'href' => '/system/configurations',
                 'icon' => 'Settings',
                 'position' => 5,
                 'parent_id' => null, // Will be updated after System is created

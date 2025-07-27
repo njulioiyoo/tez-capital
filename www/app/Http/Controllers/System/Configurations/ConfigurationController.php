@@ -9,10 +9,21 @@ use App\Models\Configuration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ConfigurationController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(): Response
+    {
+        $configurations = Configuration::getAllGrouped();
+
+        return Inertia::render('system/configurations/Configurations', [
+            'configurations' => $configurations,
+        ]);
+    }
+
+    public function api(): JsonResponse
     {
         $configurations = Configuration::getAllGrouped();
 

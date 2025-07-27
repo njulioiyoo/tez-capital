@@ -49,7 +49,7 @@ class EducationController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return Inertia::render('Education', [
+        return Inertia::render('content/Education', [
             'education' => $education,
             'categories' => Education::getCategories(),
             'filters' => $request->only(['search', 'category', 'status']),
@@ -62,7 +62,7 @@ class EducationController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('EducationForm', [
+        return Inertia::render('content/EducationForm', [
             'education' => null,
             'categories' => Education::getCategories(),
             'bilingualEnabled' => Configuration::get('bilingual_enabled', false),
@@ -138,7 +138,7 @@ class EducationController extends Controller
      */
     public function show(Education $education): Response
     {
-        return Inertia::render('EducationDetail', [
+        return Inertia::render('content/EducationDetail', [
             'education' => $education,
             'categories' => Education::getCategories(),
             'bilingualEnabled' => Configuration::get('bilingual_enabled', false),
@@ -151,7 +151,7 @@ class EducationController extends Controller
      */
     public function edit(Education $education): Response
     {
-        return Inertia::render('EducationForm', [
+        return Inertia::render('content/EducationForm', [
             'education' => $education,
             'categories' => Education::getCategories(),
             'bilingualEnabled' => Configuration::get('bilingual_enabled', false),

@@ -95,7 +95,9 @@ const fetchAudits = async (page = 1) => {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
             },
+            credentials: 'include',
         });
         
         if (!response.ok) {
@@ -121,7 +123,9 @@ const fetchStats = async () => {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
             },
+            credentials: 'include',
         });
         
         if (!response.ok) {

@@ -187,7 +187,7 @@ const formatWhatsAppLink = (number: string) => {
                         v-model="form.address"
                         placeholder="Enter your complete business address"
                         :disabled="isLoading"
-                        rows="3"
+                        :rows="3"
                     />
                     <p class="text-sm text-muted-foreground">
                         Complete business address for official correspondence

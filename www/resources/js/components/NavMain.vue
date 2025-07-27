@@ -20,10 +20,42 @@ defineProps<{
 
 const page = usePage();
 
+const legacyToNewMapping: Record<string, string> = {
+    '/users': '/system/users',
+    '/roles': '/system/roles',
+    '/configurations': '/system/configurations',
+    '/menu-manager': '/system/menu',
+    '/audit-log': '/system/audit-log'
+};
+
+const reverseMapping = Object.fromEntries(
+    Object.entries(legacyToNewMapping).map(([key, value]) => [value, key])
+);
+
+const isUrlMatch = (itemHref: string, currentUrl: string): boolean => {
+    if (itemHref === currentUrl) return true;
+    
+    // Check legacy to new mapping
+    const mappedUrl = legacyToNewMapping[itemHref];
+    if (mappedUrl && mappedUrl === currentUrl) return true;
+    
+    // Check reverse mapping (new URL in DB, legacy current URL)
+    const reverseMappedUrl = reverseMapping[itemHref];
+    if (reverseMappedUrl && reverseMappedUrl === currentUrl) return true;
+    
+    return false;
+};
+
+const isChildActive = (child: NavItem): boolean => {
+    if (!child.href) return false;
+    return isUrlMatch(child.href, page.url);
+};
+
 const isActive = (item: NavItem): boolean => {
-    if (item.href && item.href === page.url) return true;
+    if (item.href && isUrlMatch(item.href, page.url)) return true;
+    
     if (item.children) {
-        return item.children.some(child => child.href === page.url);
+        return item.children.some(child => isChildActive(child));
     }
     return false;
 };
@@ -65,7 +97,7 @@ const isActive = (item: NavItem): boolean => {
                                 <SidebarMenuSubItem v-for="subItem in item.children" :key="subItem.id">
                                     <SidebarMenuSubButton 
                                         as-child 
-                                        :is-active="subItem.href === page.url"
+                                        :is-active="isChildActive(subItem)"
                                         :disabled="subItem.disabled"
                                     >
                                         <Link v-if="subItem.href" :href="subItem.href">
@@ -93,7 +125,7 @@ const isActive = (item: NavItem): boolean => {
                 <SidebarMenuItem v-else>
                     <SidebarMenuButton 
                         as-child 
-                        :is-active="item.href === page.url" 
+                        :is-active="item.href ? isUrlMatch(item.href, page.url) : false" 
                         :tooltip="item.title"
                         :disabled="item.disabled"
                     >

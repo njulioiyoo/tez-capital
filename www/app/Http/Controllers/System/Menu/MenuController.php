@@ -8,13 +8,27 @@ use App\Http\Requests\System\Menu\MenuItemStoreRequest;
 use App\Http\Requests\System\Menu\MenuItemUpdateRequest;
 use App\Models\MenuItem;
 use Illuminate\Http\JsonResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class MenuController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display the menu management page.
      */
-    public function index(): JsonResponse
+    public function index(): Response
+    {
+        $menuItems = MenuItem::getMenuTree();
+
+        return Inertia::render('system/menu/MenuManager', [
+            'menuItems' => $menuItems->map(fn ($item) => $item->toMenuArray()),
+        ]);
+    }
+
+    /**
+     * Get menu items via API.
+     */
+    public function api(): JsonResponse
     {
         $menuItems = MenuItem::getMenuTree();
 

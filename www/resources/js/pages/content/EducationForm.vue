@@ -323,7 +323,7 @@ const goBack = () => {
                                         id="description_id"
                                         v-model="form.description_id"
                                         placeholder="Enter Indonesian description"
-                                        rows="3"
+                                        :rows="3"
                                     />
                                 </div>
 
@@ -367,7 +367,7 @@ const goBack = () => {
                                         id="description_en"
                                         v-model="form.description_en"
                                         placeholder="Enter English description"
-                                        rows="3"
+                                        :rows="3"
                                     />
                                 </div>
 
@@ -510,7 +510,7 @@ const goBack = () => {
                                             id="meta_description_id"
                                             v-model="form.meta_description_id"
                                             placeholder="Auto-generated from description"
-                                            rows="3"
+                                            :rows="3"
                                             maxlength="160"
                                         />
                                         <p class="text-sm text-gray-500 mt-1">{{ form.meta_description_id.length }}/160 characters</p>
@@ -536,7 +536,7 @@ const goBack = () => {
                                             id="meta_description_en"
                                             v-model="form.meta_description_en"
                                             placeholder="Auto-generated from description"
-                                            rows="3"
+                                            :rows="3"
                                             maxlength="160"
                                         />
                                         <p class="text-sm text-gray-500 mt-1">{{ form.meta_description_en.length }}/160 characters</p>

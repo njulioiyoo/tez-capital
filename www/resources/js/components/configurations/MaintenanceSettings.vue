@@ -168,7 +168,7 @@ const formatEndTime = (datetime: string) => {
                         v-model="form.maintenance_message"
                         placeholder="Enter the message users will see during maintenance"
                         :disabled="isLoading"
-                        rows="4"
+                        :rows="4"
                     />
                     <p class="text-sm text-muted-foreground">
                         This message will be displayed to users when maintenance mode is enabled

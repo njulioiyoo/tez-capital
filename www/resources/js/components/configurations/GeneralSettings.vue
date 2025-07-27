@@ -115,7 +115,7 @@ const saveSettings = () => {
                         v-model="form.app_description"
                         placeholder="Enter application description"
                         :disabled="isLoading"
-                        rows="3"
+                        :rows="3"
                     />
                     <p class="text-sm text-muted-foreground">
                         A brief description of your application for SEO and marketing purposes

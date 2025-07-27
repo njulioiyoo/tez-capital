@@ -40,8 +40,8 @@ interface ConfigurationData {
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'System', href: '/dashboard' },
-    { label: 'Configurations', href: '/configurations' }
+    { label: 'System', href: '/system' },
+    { label: 'Configurations', href: '/system/configurations' }
 ];
 
 const activeTab = ref('general');
@@ -84,7 +84,7 @@ const loadConfigurations = async () => {
         }
 
         const response = await fetch('/api/system/configurations', {
-            credentials: 'same-origin',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -143,7 +143,7 @@ const saveBulkConfigurations = async (group: string, changes: Array<{key: string
                     const response = await fetch(`/api/system/configurations`, {
                         method: 'POST',
                         body: formData,
-                        credentials: 'same-origin',
+                        credentials: 'include',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
                             'X-CSRF-TOKEN': csrfToken,
@@ -338,7 +338,7 @@ const saveBulkNonFileConfigurations = async (group: string, changes: Array<{key:
         const response = await fetch(`/api/system/configurations/bulk-update`, {
             method: 'POST',
             body: JSON.stringify(payload),
-            credentials: 'same-origin',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -413,45 +413,40 @@ onMounted(() => {
 <template>
     <Head title="Website Configurations" />
 
-    <AppLayout>
-        <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    Website Configurations
-                </h2>
-                <div class="flex gap-2">
-                    <Button 
-                        @click="loadConfigurations" 
-                        variant="outline" 
-                        size="sm"
-                        :disabled="isLoading"
-                    >
-                        <RefreshCw :class="{ 'animate-spin': isLoading }" class="w-4 h-4 mr-2" />
-                        Refresh
-                    </Button>
-                    <Button 
-                        @click="testToast" 
-                        variant="outline" 
-                        size="sm"
-                    >
-                        Test Toast
-                    </Button>
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div class="space-y-6">
+                <!-- Header -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <Settings class="w-8 h-8 text-primary" />
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight">Website Configurations</h1>
+                            <p class="text-muted-foreground">
+                                Manage your website settings, branding, content, and system configurations
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <Button 
+                            @click="loadConfigurations" 
+                            variant="outline" 
+                            size="sm"
+                            :disabled="isLoading"
+                        >
+                            <RefreshCw :class="{ 'animate-spin': isLoading }" class="w-4 h-4 mr-2" />
+                            Refresh
+                        </Button>
+                        <Button 
+                            @click="testToast" 
+                            variant="outline" 
+                            size="sm"
+                        >
+                            Test Toast
+                        </Button>
+                    </div>
                 </div>
-            </div>
-        </template>
-
-        <div class="py-6">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <Card>
-                    <CardHeader>
-                        <CardTitle class="flex items-center gap-2">
-                            <Settings class="w-5 h-5" />
-                            Website Configuration Management
-                        </CardTitle>
-                        <CardDescription>
-                            Manage your website settings, branding, content, and system configurations
-                        </CardDescription>
-                    </CardHeader>
                     <CardContent>
                         <Tabs v-model:modelValue="activeTab" class="w-full">
                             <TabsList class="grid w-full grid-cols-7">
