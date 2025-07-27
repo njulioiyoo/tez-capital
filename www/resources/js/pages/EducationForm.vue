@@ -305,8 +305,8 @@ const goBack = () => {
                                     Main content in Bahasa Indonesia
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent class="space-y-4">
-                                <div>
+                            <CardContent class="form-group">
+                                <div class="form-field">
                                     <Label for="title_id">Title (Indonesian) *</Label>
                                     <Input
                                         id="title_id"
@@ -317,7 +317,7 @@ const goBack = () => {
                                     <p v-if="errors.title_id" class="text-red-500 text-sm mt-1">{{ errors.title_id }}</p>
                                 </div>
 
-                                <div>
+                                <div class="form-field">
                                     <Label for="description_id">Description (Indonesian)</Label>
                                     <Textarea
                                         id="description_id"
@@ -327,7 +327,7 @@ const goBack = () => {
                                     />
                                 </div>
 
-                                <div>
+                                <div class="form-field">
                                     <Label for="content_id">Content (Indonesian)</Label>
                                     <RichTextEditor
                                         v-model="form.content_id"
@@ -349,8 +349,8 @@ const goBack = () => {
                                     Content translated to English
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent class="space-y-4">
-                                <div>
+                            <CardContent class="form-group">
+                                <div class="form-field">
                                     <Label for="title_en">Title (English) *</Label>
                                     <Input
                                         id="title_en"
@@ -361,7 +361,7 @@ const goBack = () => {
                                     <p v-if="errors.title_en" class="text-red-500 text-sm mt-1">{{ errors.title_en }}</p>
                                 </div>
 
-                                <div>
+                                <div class="form-field">
                                     <Label for="description_en">Description (English)</Label>
                                     <Textarea
                                         id="description_en"
@@ -371,7 +371,7 @@ const goBack = () => {
                                     />
                                 </div>
 
-                                <div>
+                                <div class="form-field">
                                     <Label for="content_en">Content (English)</Label>
                                     <RichTextEditor
                                         v-model="form.content_en"
@@ -392,8 +392,8 @@ const goBack = () => {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div class="space-y-4">
-                                    <div>
+                                <div class="form-group">
+                                    <div class="form-field">
                                         <Label for="image">Upload Image</Label>
                                         <Input
                                             id="image"
@@ -424,8 +424,8 @@ const goBack = () => {
                                     Category & Tags
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent class="space-y-4">
-                                <div>
+                            <CardContent class="form-group">
+                                <div class="form-field">
                                     <Label for="category">Category *</Label>
                                     <Select v-model:modelValue="form.category">
                                         <option v-for="(label, value) in categories" :key="value" :value="value">
@@ -435,7 +435,7 @@ const goBack = () => {
                                     <p v-if="errors.category" class="text-red-500 text-sm mt-1">{{ errors.category }}</p>
                                 </div>
 
-                                <div>
+                                <div class="form-field">
                                     <Label>Tags</Label>
                                     <div class="flex gap-2 mb-2">
                                         <Input
@@ -463,7 +463,7 @@ const goBack = () => {
                                     </div>
                                 </div>
 
-                                <div>
+                                <div class="form-field">
                                     <Label for="sort_order">Sort Order</Label>
                                     <Input
                                         id="sort_order"

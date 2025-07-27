@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import Editor from '@tinymce/tinymce-vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { QuillEditor } from '@vueup/vue-quill';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 interface Props {
     modelValue: string;
@@ -24,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 const content = ref(props.modelValue);
+const quillEditor = ref<any>(null);
 
 // Watch for external model changes
 watch(() => props.modelValue, (newValue) => {
@@ -32,81 +34,27 @@ watch(() => props.modelValue, (newValue) => {
     }
 });
 
-const handleInput = (value: string) => {
-    content.value = value;
-    emit('update:modelValue', value);
+const handleTextChange = () => {
+    const html = quillEditor.value?.getHTML();
+    content.value = html || '';
+    emit('update:modelValue', html || '');
 };
 
-// TinyMCE configuration optimized for education content
-const editorConfig = {
-    height: props.height,
-    menubar: true,
-    base_url: '/tinymce',
-    suffix: '.min',
-    plugins: [
-        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount',
-        'emoticons', 'template', 'paste', 'textcolor', 'colorpicker'
-    ],
-    toolbar: [
-        'undo redo | blocks | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify',
-        'bullist numlist outdent indent | removeformat | help',
-        'link image media | table | code | fullscreen preview'
-    ].join(' | '),
-    toolbar_mode: 'sliding',
-    content_style: `
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
-            font-size: 14px; 
-            line-height: 1.6;
-            color: #333;
-        }
-        h1, h2, h3, h4, h5, h6 { 
-            margin-top: 1.5em; 
-            margin-bottom: 0.5em; 
-            font-weight: 600;
-        }
-        p { margin-bottom: 1em; }
-        img { max-width: 100%; height: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        table td, table th { border: 1px solid #ddd; padding: 8px; }
-        table th { background-color: #f4f4f4; font-weight: 600; }
-        blockquote { 
-            border-left: 4px solid #e5e7eb; 
-            margin: 1em 0; 
-            padding: 0.5em 1em; 
-            background-color: #f9fafb;
-            font-style: italic;
-        }
-        code { 
-            background-color: #f3f4f6; 
-            padding: 0.2em 0.4em; 
-            border-radius: 3px; 
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        }
-        pre { 
-            background-color: #f3f4f6; 
-            padding: 1em; 
-            border-radius: 6px; 
-            overflow-x: auto;
-        }
-    `,
-    placeholder: props.placeholder,
-    branding: false,
-    promotion: false,
-    resize: true,
-    contextmenu: 'link image table',
-    paste_data_images: true,
-    automatic_uploads: true,
-    file_picker_types: 'image',
-    images_upload_handler: async (blobInfo: any) => {
-        // Create FormData for image upload
+// Custom image upload handler
+const imageHandler = () => {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+
+    input.onchange = async () => {
+        const file = input.files?.[0];
+        if (!file) return;
+
         const formData = new FormData();
-        formData.append('file', blobInfo.blob(), blobInfo.filename());
-        
+        formData.append('file', file);
+
         try {
-            // Upload to your Laravel backend
             const response = await fetch('/api/system/education/upload-image', {
                 method: 'POST',
                 headers: {
@@ -115,79 +63,168 @@ const editorConfig = {
                 },
                 body: formData
             });
-            
+
             const result = await response.json();
             if (response.ok) {
-                return result.url;
+                const quill = quillEditor.value?.getQuill();
+                const range = quill?.getSelection();
+                if (range) {
+                    quill.insertEmbed(range.index, 'image', result.url);
+                }
             } else {
-                throw new Error(result.message || 'Upload failed');
+                console.error('Upload failed:', result.message);
             }
         } catch (error) {
             console.error('Image upload failed:', error);
-            throw error;
         }
-    },
-    setup: (editor: any) => {
-        // Add custom styles for better content presentation
-        editor.on('init', () => {
-            editor.getDoc().documentElement.style.fontSize = '14px';
-        });
+    };
+};
+
+// Quill configuration
+const editorOptions = {
+    theme: 'snow',
+    placeholder: props.placeholder,
+    readOnly: props.readonly || props.disabled,
+    modules: {
+        toolbar: {
+            container: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['blockquote', 'code-block'],
+                ['link', 'image'],
+                ['clean']
+            ],
+            handlers: {
+                image: imageHandler
+            }
+        }
     }
 };
+
+onMounted(() => {
+    // Set initial content when component mounts
+    if (props.modelValue && quillEditor.value) {
+        quillEditor.value.setHTML(props.modelValue);
+    }
+});
 </script>
 
 <template>
-    <div class="rich-text-editor">
-        <Editor
-            v-model="content"
-            :api-key="'no-api-key'"
-            :init="editorConfig"
-            :disabled="disabled || readonly"
-            @input="handleInput"
+    <div class="rich-text-editor" :style="{ minHeight: height + 'px' }">
+        <QuillEditor
+            ref="quillEditor"
+            v-model:content="content"
+            content-type="html"
+            :options="editorOptions"
+            @textChange="handleTextChange"
         />
     </div>
 </template>
 
 <style scoped>
 .rich-text-editor {
-    @apply w-full;
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    overflow: hidden;
 }
 
-/* Override TinyMCE theme to match our design system */
-:deep(.tox-tinymce) {
-    border: 1px solid hsl(var(--border));
-    border-radius: calc(var(--radius) - 2px);
+/* Quill Editor Styling */
+:deep(.ql-toolbar) {
+    background-color: #f9fafb;
+    border-bottom: 1px solid #d1d5db;
+    border-top: none;
+    border-left: none;
+    border-right: none;
 }
 
-:deep(.tox-editor-header) {
-    background: hsl(var(--background));
-    border-bottom: 1px solid hsl(var(--border));
+:deep(.ql-container) {
+    border: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
 }
 
-:deep(.tox-toolbar) {
-    background: hsl(var(--background));
-    border-bottom: 1px solid hsl(var(--border));
+:deep(.ql-editor) {
+    padding: 1rem;
+    min-height: 300px;
 }
 
-:deep(.tox-edit-area) {
-    background: hsl(var(--background));
+:deep(.ql-editor h1) {
+    font-size: 2em;
+    font-weight: 600;
+    margin: 1.5em 0 0.5em 0;
 }
 
-:deep(.tox-edit-area__iframe) {
-    background: hsl(var(--background));
+:deep(.ql-editor h2) {
+    font-size: 1.5em;
+    font-weight: 600;
+    margin: 1.3em 0 0.5em 0;
+}
+
+:deep(.ql-editor h3) {
+    font-size: 1.17em;
+    font-weight: 600;
+    margin: 1.17em 0 0.5em 0;
+}
+
+:deep(.ql-editor p) {
+    margin-bottom: 1em;
+}
+
+:deep(.ql-editor img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+:deep(.ql-editor blockquote) {
+    border-left: 4px solid #e5e7eb;
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    background-color: #f9fafb;
+    font-style: italic;
+}
+
+:deep(.ql-editor code) {
+    background-color: #f3f4f6;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+:deep(.ql-editor pre) {
+    background-color: #f3f4f6;
+    padding: 1em;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+:deep(.ql-editor ul, .ql-editor ol) {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+:deep(.ql-editor li) {
+    margin-bottom: 0.25rem;
 }
 
 /* Focus state */
-:deep(.tox-tinymce:focus-within) {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
+:deep(.ql-container.ql-snow) {
+    border: none;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    :deep(.tox) {
-        --tox-icon-color: hsl(var(--foreground));
-        --tox-toolbar-bg: hsl(var(--background));
-    }
+:deep(.ql-toolbar.ql-snow) {
+    border: none;
+}
+
+.rich-text-editor:focus-within {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
 }
 </style>

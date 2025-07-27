@@ -166,6 +166,21 @@
     }
 }
 
+/* Form field spacing utilities */
+@layer components {
+    .form-field {
+        @apply space-y-2;
+    }
+    
+    .form-group {
+        @apply space-y-4;
+    }
+    
+    .form-section {
+        @apply space-y-6;
+    }
+}
+
 /* Custom prose styles for rich content */
 @layer components {
     .prose {
