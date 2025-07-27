@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EducationController;
 use App\Http\Controllers\System\AuditLog\AuditLogController;
 use App\Http\Controllers\System\Configurations\ConfigurationController;
 use App\Http\Controllers\System\Menu\MenuController;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    return redirect()->route('login');
 })->name('home');
 
 Route::get('dashboard', function () {
@@ -37,11 +38,28 @@ Route::get('configurations', function () {
     return Inertia::render('Configurations');
 })->middleware(['auth', 'verified'])->name('configurations');
 
+Route::get('education', [EducationController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('education');
+
+Route::get('education/create', [EducationController::class, 'create'])
+    ->middleware(['auth', 'verified'])
+    ->name('education.create');
+
+Route::get('education/{education}', [EducationController::class, 'show'])
+    ->middleware(['auth', 'verified'])
+    ->name('education.show');
+
+Route::get('education/{education}/edit', [EducationController::class, 'edit'])
+    ->middleware(['auth', 'verified'])
+    ->name('education.edit');
+
 // API routes grouped by functionality
 Route::prefix('api')->group(function () {
     // Public endpoints
     Route::get('menu-items', [MenuController::class, 'index'])->name('api.menu-items.index');
     Route::get('configurations/public', [ConfigurationController::class, 'getPublic'])->name('api.configurations.public');
+    Route::get('education', [EducationController::class, 'api'])->name('api.education.index');
     Route::get('csrf-token', function () {
         return response()->json(['csrf_token' => csrf_token()]);
     })->name('api.csrf-token');
@@ -94,6 +112,15 @@ Route::prefix('api')->group(function () {
                 Route::put('{configuration}', [ConfigurationController::class, 'update'])->name('update');
                 Route::delete('{configuration}', [ConfigurationController::class, 'destroy'])->name('destroy');
                 Route::post('bulk-update', [ConfigurationController::class, 'updateMultiple'])->name('bulk-update');
+            });
+
+            // Education routes
+            Route::prefix('education')->name('education.')->group(function () {
+                Route::post('/', [EducationController::class, 'store'])->name('store');
+                Route::put('{education}', [EducationController::class, 'update'])->name('update');
+                Route::delete('{education}', [EducationController::class, 'destroy'])->name('destroy');
+                Route::post('bulk-action', [EducationController::class, 'bulkAction'])->name('bulk-action');
+                Route::post('{education}/view', [EducationController::class, 'updateViewCount'])->name('view');
             });
         });
 
