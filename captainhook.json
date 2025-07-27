@@ -1,0 +1,72 @@
+{
+    "config": {
+        "bootstrap": "www/vendor/autoload.php",
+        "fail-on-first-error": true,
+        "includes": [],
+        "colors": true
+    },
+    "commit-msg": {
+        "enabled": false,
+        "actions": []
+    },
+    "pre-push": {
+        "enabled": false,
+        "actions": []
+    },
+    "pre-commit": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "cd www && php check-unused-vars.php",
+                "options": [],
+                "conditions": [
+                    {
+                        "exec": "test -f www/check-unused-vars.php"
+                    }
+                ]
+            },
+            {
+                "action": "cd www && vendor/bin/pint --test",
+                "options": [],
+                "conditions": [
+                    {
+                        "exec": "test -f www/vendor/bin/pint"
+                    }
+                ]
+            },
+            {
+                "action": "cd www && vendor/bin/phpstan analyse --memory-limit=2G --no-progress",
+                "options": [],
+                "conditions": [
+                    {
+                        "exec": "test -f www/vendor/bin/phpstan"
+                    }
+                ]
+            }
+        ]
+    },
+    "prepare-commit-msg": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-commit": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-merge": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-checkout": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-rewrite": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-update": {
+        "enabled": false,
+        "actions": []
+    }
+}

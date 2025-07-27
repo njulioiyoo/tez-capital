@@ -17,7 +17,6 @@ services:
       - 5173:5173
     volumes:
       - ${PWD}/www:/var/www/html:z
-      - ${PWD}/composer.phar:/usr/local/bin/composer
     networks:
       - traefik-public
       - postgres-network
